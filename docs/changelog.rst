@@ -7,7 +7,7 @@ CHANGELOG
 
 **Bug fixes**
 
-*
+* Slugify pictogram urls
 
 
 2.19.1 (2018-05-28)

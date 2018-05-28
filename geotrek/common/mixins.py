@@ -372,8 +372,18 @@ class PublishableMixin(BasePublishableMixin):
         return self.any_published
 
 
+def pictogram_upload_to(instance, filename):
+    name, ext = os.path.splitext(filename)
+    renamed = slugify(name) + ext
+    return 'pictograms/{}/{}/{}'.format(
+        instance._meta.app_label,
+        instance._meta.model_name,
+        renamed
+    )
+
+
 class PictogramMixin(models.Model):
-    pictogram = models.FileField(verbose_name=_(u"Pictogram"), upload_to=settings.UPLOAD_DIR,
+    pictogram = models.FileField(verbose_name=_(u"Pictogram"), upload_to=pictogram_upload_to,
                                  db_column='picto', max_length=512, null=True)
 
     class Meta:
