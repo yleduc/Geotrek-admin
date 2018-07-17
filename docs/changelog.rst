@@ -228,6 +228,7 @@ CHANGELOG
 
 - Add a settings allowing to remove certain items from the left menu
 - Serve attachment with 'Topoguide' type as public PDF
+- Avoid calculate altimetry when the geometry didn't change.
 
 **Bug fixes**
 
@@ -313,7 +314,7 @@ CHANGELOG
 2.27.6 (2019-06-04)
 -------------------
 
-**Bug fixes**
+**Minor changes**
 
 - Fix mobile API
 
