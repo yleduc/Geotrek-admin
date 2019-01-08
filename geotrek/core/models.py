@@ -213,13 +213,6 @@ class Path(AddPropertyMixin, MapEntityMixin, AltimetryMixin,
         return _("Trails")
 
     @property
-    def trails_display(self):
-        trails = getattr(self, '_trails', self.trails)
-        if trails:
-            return ", ".join([t.name_display for t in trails])
-        return _("None")
-
-    @property
     def trails_csv_display(self):
         trails = getattr(self, '_trails', self.trails)
         if trails:
