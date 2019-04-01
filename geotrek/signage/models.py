@@ -176,6 +176,8 @@ class Blade(NoDeleteMixin, MapEntityMixin, StructureRelated):
     number = models.CharField(verbose_name=_(u"Number"), max_length=250, db_column='numero')
     direction = models.ForeignKey(Direction, verbose_name=_(u"Direction"), db_column='direction',
                                   on_delete=models.PROTECT)
+    direction_blade = models.BooleanField(db_column='direction_sur_lame', verbose_name=_("Direction on blade"),
+                                          default=settings.DIRECTION_ON_BLADE, null=False, blank=False)
     type = models.ForeignKey(BladeType, db_column='type', verbose_name=_("Type"))
     color = models.ForeignKey(Color, db_column='couleur', on_delete=models.PROTECT, null=True, blank=True,
                               verbose_name=_("Color"))
@@ -236,6 +238,8 @@ class Line(StructureRelated):
                                       blank=True, null=True)
     time = models.DurationField(db_column='temps', verbose_name=pgettext_lazy("duration", "Time"), null=True, blank=True,
                                 help_text=_("Hours:Minutes:Seconds"))
+    direction = models.ForeignKey(Direction, verbose_name=_(u"Direction"), db_column='direction',
+                                  on_delete=models.PROTECT)
     distance_verbose_name = _("Distance (km)")
     time_verbose_name = _("Time (Hours:Minutes:Seconds)")
     colorblade_verbose_name = _("Color")
