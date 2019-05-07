@@ -44,7 +44,7 @@ class Command(BaseCommand):
                 name = name.decode('utf-8')
             poitype = feature.GetFieldAsString(self.field_poitype)
             if poitype:
-                poitype = poitype.decode('utf-8')
+                poitype = poitype.decode('utf-8').capitalize()
             self.create_poi(geometry, name, poitype)
 
     def create_poi(self, geometry, name, poitype):
