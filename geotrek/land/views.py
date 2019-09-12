@@ -1,9 +1,12 @@
+from django.conf import settings
+from django.views.generic.edit import BaseDetailView
+
 from mapentity.views import (MapEntityLayer, MapEntityList, MapEntityJsonList, MapEntityFormat,
                              MapEntityDetail, MapEntityDocument, MapEntityCreate, MapEntityUpdate, MapEntityDelete)
 
 from geotrek.core.models import AltimetryMixin
 from geotrek.core.views import CreateFromTopologyMixin
-from .models import (PhysicalEdge, LandEdge, CompetenceEdge,
+from .models import (PhysicalEdge, LandEdge, LandType, CompetenceEdge,
                      WorkManagementEdge, SignageManagementEdge)
 from .filters import PhysicalEdgeFilterSet, LandEdgeFilterSet, CompetenceEdgeFilterSet, WorkManagementEdgeFilterSet, SignageManagementEdgeFilterSet
 from .forms import PhysicalEdgeForm, LandEdgeForm, CompetenceEdgeForm, WorkManagementEdgeForm, SignageManagementEdgeForm
@@ -63,6 +66,15 @@ class LandEdgeList(MapEntityList):
     queryset = LandEdge.objects.existing()
     filterform = LandEdgeFilterSet
     columns = ['id', 'land_type', 'length']
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(LandEdgeList, self).get_context_data(*args, **kwargs)
+        context['legend'] = self.get_legend()
+        return context
+
+    def get_legend(self):
+        legend = [(type.name, settings.COLORS_POOL['land'][type.id % len(settings.COLORS_POOL['land'])]) for type in LandType.objects.all()]
+        return legend
 
 
 class LandEdgeJsonList(MapEntityJsonList, LandEdgeList):
@@ -232,3 +244,13 @@ class SignageManagementEdgeUpdate(MapEntityUpdate):
 
 class SignageManagementEdgeDelete(MapEntityDelete):
     model = SignageManagementEdge
+
+
+class LandChart(BaseDetailView):
+
+    def dispatch(self, *args, **kwargs):
+        return super(LandChart, self).dispatch(*args, **kwargs)
+
+    def render_to_response(self, context, **response_kwargs):
+        print("coucou")
+        return None

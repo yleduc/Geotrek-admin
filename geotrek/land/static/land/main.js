@@ -23,6 +23,7 @@ $(window).on('entity:map', function (e, data) {
             style: style,
             onEachFeature: initLandLayer(managementLayer),
         });
+
         var colorspool = colorspools[managementLayer.id];
         var nameHTML = '';
         for (var j=0; j<4; j++) {
@@ -41,6 +42,7 @@ $(window).on('entity:map', function (e, data) {
                 }
             }
         }
+        $( "#mainmap" ).append($('<div id="landgraph"><a class="toggle" title="{% trans "Toggle land edge legend" %}">&nbsp;</a><h4>{% trans "Land" %}</h4><br>{% for category in legend %}<h6 style="color:{{ category.1 }};">{{ category.0 }}</h6>{% endfor %}</div>'))
     });
 
     function initLandLayer(layergroup) {
@@ -55,7 +57,7 @@ $(window).on('entity:map', function (e, data) {
             layer.setStyle({color: color});
 
             // Add label in the middle of the line
-            if (data.properties.name) {
+            if (data.properties.name && window.SETTINGS.map.showonline) {
                 MapEntity.showLineLabel(layer, {
                     color: color,
                     text: data.properties.name,
@@ -66,3 +68,17 @@ $(window).on('entity:map', function (e, data) {
         };
     }
 });
+$(window).
+    <div id="landgraph">
+        <a class="toggle" title="{% trans "Toggle land edge legend" %}">&nbsp;</a><h4>{% trans "Land" %}</h4><br>
+        {% for category in legend %}
+            <h6 style="color:{{ category.1 }};">{{ category.0 }}</h6>
+        {% endfor %}
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#landgraph a.toggle').click(function (e) {
+                $('#landgraph').toggleClass('colapsed');
+            });
+        });
+    </script>

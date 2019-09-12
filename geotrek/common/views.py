@@ -154,6 +154,7 @@ class JSSettings(mapentity_views.JSSettings):
             snap_distance=settings.SNAP_DISTANCE,
             paths_line_marker=settings.PATHS_LINE_MARKER,
             colorspool=settings.COLORS_POOL,
+            showonline=settings.SHOW_LABEL_ON_LINE,
         )
         dictsettings['version'] = __version__
         dictsettings['showExtremities'] = settings.SHOW_EXTREMITIES

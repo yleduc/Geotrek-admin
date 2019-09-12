@@ -150,7 +150,7 @@ span.aggregation {
     margin-top: -5px;
 }
 
-#altitudegraph {
+#altitudegraph, landgraph{
     position: fixed;
     bottom: 10px;
     right: 10px;
@@ -161,11 +161,11 @@ span.aggregation {
     width: 30%;
 }
 
-#altitudegraph h4 {
+#altitudegraph h4, landgraph h4{
     margin: 0px;
 }
 
-#altitudegraph.colapsed {
+#altitudegraph.colapsed, landgraph.colapsed{
     width: 20px;
 }
 #altitudegraph.colapsed img,
@@ -173,7 +173,12 @@ span.aggregation {
     display: none;
 }
 
-#altitudegraph a.toggle {
+#landgraph.colapsed h4 {
+    display: none;
+}
+
+#altitudegraph a.toggle,
+#landgraph a.toggle{
     background: url(images/toggle.png) no-repeat;
     background-position: 1px 2px;
     background-repeat: no-repeat;
@@ -184,6 +189,10 @@ span.aggregation {
 }
 
 #altitudegraph.colapsed a.toggle {
+    background-position: 1px -18px;
+}
+
+#landgraph.colapsed a.toggle {
     background-position: 1px -18px;
 }
 

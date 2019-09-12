@@ -429,6 +429,7 @@ PATHS_LINE_MARKER = 'dotL'
 PATH_SNAPPING_DISTANCE = 1  # Distance of path snapping in meters
 SNAP_DISTANCE = 30  # Distance of snapping in pixels
 PATH_MERGE_SNAPPING_DISTANCE = 2  # minimum distance to merge paths
+SHOW_LABEL_ON_LINE = False  # Do not show the label on the lines mostly use on land app
 
 ALTIMETRIC_PROFILE_PRECISION = 25  # Sampling precision in meters
 ALTIMETRIC_PROFILE_AVERAGE = 2  # nb of points for altimetry moving average
