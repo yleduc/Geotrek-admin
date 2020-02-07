@@ -31,8 +31,9 @@ class PhysicalEdge(MapEntityMixin, Topology):
                                       db_column='type')
     eid = models.CharField(verbose_name=_("External id"), max_length=1024, blank=True, null=True,
                            db_column='id_externe')
+
     # Override default manager
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 'f_t_nature'
@@ -64,7 +65,7 @@ class PhysicalEdge(MapEntityMixin, Topology):
 
     @classmethod
     def path_physicals(cls, path):
-        return cls.objects.existing().select_related('physical_type').filter(aggregations__path=path).distinct('pk')
+        return cls.objects.select_related('physical_type').filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_physicals(cls, topology):
@@ -103,7 +104,7 @@ class LandEdge(MapEntityMixin, Topology):
                            db_column='id_externe')
 
     # Override default manager
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 'f_t_foncier'
@@ -135,7 +136,7 @@ class LandEdge(MapEntityMixin, Topology):
 
     @classmethod
     def path_lands(cls, path):
-        return cls.objects.existing().select_related('land_type').filter(aggregations__path=path).distinct('pk')
+        return cls.objects.select_related('land_type').filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_lands(cls, topology):
@@ -156,7 +157,10 @@ class CompetenceEdge(MapEntityMixin, Topology):
                            db_column='id_externe')
 
     # Override default manager
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
+
+    # Override default manager
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 'f_t_competence'
@@ -188,7 +192,7 @@ class CompetenceEdge(MapEntityMixin, Topology):
 
     @classmethod
     def path_competences(cls, path):
-        return cls.objects.existing().select_related('organization').filter(aggregations__path=path).distinct('pk')
+        return cls.objects.select_related('organization').filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_competences(cls, topology):
@@ -209,7 +213,7 @@ class WorkManagementEdge(MapEntityMixin, Topology):
                            db_column='id_externe')
 
     # Override default manager
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 'f_t_gestion_travaux'
@@ -241,7 +245,7 @@ class WorkManagementEdge(MapEntityMixin, Topology):
 
     @classmethod
     def path_works(cls, path):
-        return cls.objects.existing().select_related('organization').filter(aggregations__path=path).distinct('pk')
+        return cls.objects.select_related('organization').filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_works(cls, topology):
@@ -262,7 +266,7 @@ class SignageManagementEdge(MapEntityMixin, Topology):
                            db_column='id_externe')
 
     # Override default manager
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 'f_t_gestion_signaletique'
@@ -294,7 +298,7 @@ class SignageManagementEdge(MapEntityMixin, Topology):
 
     @classmethod
     def path_signages(cls, path):
-        return cls.objects.existing().select_related('organization').filter(aggregations__path=path).distinct('pk')
+        return cls.objects.select_related('organization').filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_signages(cls, topology):

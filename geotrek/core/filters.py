@@ -60,7 +60,7 @@ class TopologyFilter(ModelChoiceFilter):
             return qs.filter(topology__in=[topo.pk for topo in overlapping])
         elif issubclass(qs.model, maintenance_models.Project):
             # Find all interventions overlapping those edges
-            interventions = self._topology_filter(maintenance_models.Intervention.objects.existing()
+            interventions = self._topology_filter(maintenance_models.Intervention.objects
                                                   .select_related('project')
                                                   .filter(project__in=qs),
                                                   edges)
@@ -99,7 +99,7 @@ class TrailFilterSet(StructureRelatedFilterSet):
 
 
 class TopologyFilterTrail(TopologyFilter):
-    queryset = Trail.objects.existing()
+    queryset = Trail.objects.all()
 
 
 if settings.TRAIL_MODEL_ENABLED:

@@ -27,11 +27,11 @@ from geotrek.trekking.views import FlattenPicturesMixin
 
 class DiveLayer(MapEntityLayer):
     properties = ['name', 'published']
-    queryset = Dive.objects.existing()
+    model = Dive
 
 
 class DiveList(FlattenPicturesMixin, MapEntityList):
-    queryset = Dive.objects.existing()
+    model = Dive
     filterform = DiveFilterSet
     columns = ['id', 'name', 'levels', 'thumbnail']
 
@@ -52,7 +52,7 @@ class DiveFormatList(MapEntityFormat, DiveList):
 
 
 class DiveDetail(MapEntityDetail):
-    queryset = Dive.objects.existing()
+    model = Dive
 
     def dispatch(self, *args, **kwargs):
         lang = self.request.GET.get('lang')
@@ -68,7 +68,7 @@ class DiveDetail(MapEntityDetail):
 
 
 class DiveMapImage(MapEntityMapImage):
-    queryset = Dive.objects.existing()
+    model = Dive
 
     def dispatch(self, *args, **kwargs):
         lang = kwargs.pop('lang')
@@ -79,11 +79,11 @@ class DiveMapImage(MapEntityMapImage):
 
 
 class DiveDocument(MapEntityDocument):
-    queryset = Dive.objects.existing()
+    model = Dive
 
 
 class DiveDocumentPublicMixin(object):
-    queryset = Dive.objects.existing()
+    model = Dive
 
     def get_context_data(self, **kwargs):
         context = super(DiveDocumentPublicMixin, self).get_context_data(**kwargs)
@@ -121,7 +121,7 @@ class DiveCreate(MapEntityCreate):
 
 
 class DiveUpdate(MapEntityUpdate):
-    queryset = Dive.objects.existing()
+    model = Dive
     form_class = DiveForm
 
     @same_structure_required('diving:dive_detail')
@@ -156,7 +156,7 @@ class DiveViewSet(MapEntityViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def get_queryset(self):
-        qs = self.model.objects.existing()
+        qs = self.model.objects
         qs = qs.select_related('structure', 'difficulty', 'practice')
         qs = qs.prefetch_related('levels', 'source', 'portal', 'themes', 'attachments')
         qs = qs.filter(published=True).order_by('pk').distinct('pk')
@@ -183,7 +183,7 @@ class DivePOIViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         pk = self.kwargs['pk']
         try:
-            dive = Dive.objects.existing().get(pk=pk)
+            dive = Dive.objects.get(pk=pk)
         except Dive.DoesNotExist:
             raise Http404
         if not dive.is_public():
@@ -203,7 +203,7 @@ class DiveServiceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         pk = self.kwargs['pk']
         try:
-            dive = Dive.objects.existing().get(pk=pk)
+            dive = Dive.objects.get(pk=pk)
         except Dive.DoesNotExist:
             raise Http404
         if not dive.is_public():

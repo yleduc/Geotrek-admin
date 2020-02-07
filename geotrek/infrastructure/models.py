@@ -122,7 +122,7 @@ class InfrastructureGISManager(gismodels.GeoManager):
 class Infrastructure(MapEntityMixin, BaseInfrastructure):
     """ An infrastructure in the park, which is not of type SIGNAGE """
     type = models.ForeignKey(InfrastructureType, db_column='type', verbose_name=_("Type"))
-    objects = BaseInfrastructure.get_manager_cls(InfrastructureGISManager)()
+    objects = InfrastructureGISManager()
 
     class Meta:
         db_table = 'a_t_infrastructure'
@@ -131,7 +131,7 @@ class Infrastructure(MapEntityMixin, BaseInfrastructure):
 
     @classmethod
     def path_infrastructures(cls, path):
-        return cls.objects.existing().filter(aggregations__path=path).distinct('pk')
+        return cls.objects.filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_infrastructures(cls, topology):
@@ -139,7 +139,7 @@ class Infrastructure(MapEntityMixin, BaseInfrastructure):
             qs = cls.overlapping(topology)
         else:
             area = topology.geom.buffer(settings.TREK_INFRASTRUCTURE_INTERSECTION_MARGIN)
-            qs = cls.objects.existing().filter(geom__intersects=area)
+            qs = cls.objects.filter(geom__intersects=area)
         return qs
 
     @classmethod

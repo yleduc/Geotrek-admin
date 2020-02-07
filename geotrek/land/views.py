@@ -10,12 +10,12 @@ from .forms import PhysicalEdgeForm, LandEdgeForm, CompetenceEdgeForm, WorkManag
 
 
 class PhysicalEdgeLayer(MapEntityLayer):
-    queryset = PhysicalEdge.objects.existing()
+    model = PhysicalEdge
     properties = ['color_index', 'name']
 
 
 class PhysicalEdgeList(MapEntityList):
-    queryset = PhysicalEdge.objects.existing()
+    model = PhysicalEdge
     filterform = PhysicalEdgeFilterSet
     columns = ['id', 'physical_type', 'length']
 
@@ -33,7 +33,7 @@ class PhysicalEdgeFormatList(MapEntityFormat, PhysicalEdgeList):
 
 
 class PhysicalEdgeDetail(MapEntityDetail):
-    queryset = PhysicalEdge.objects.existing()
+    model = PhysicalEdge
 
 
 class PhysicalEdgeDocument(MapEntityDocument):
@@ -46,7 +46,7 @@ class PhysicalEdgeCreate(CreateFromTopologyMixin, MapEntityCreate):
 
 
 class PhysicalEdgeUpdate(MapEntityUpdate):
-    queryset = PhysicalEdge.objects.existing()
+    model = PhysicalEdge
     form_class = PhysicalEdgeForm
 
 
@@ -55,12 +55,12 @@ class PhysicalEdgeDelete(MapEntityDelete):
 
 
 class LandEdgeLayer(MapEntityLayer):
-    queryset = LandEdge.objects.existing()
+    model = LandEdge
     properties = ['color_index', 'name']
 
 
 class LandEdgeList(MapEntityList):
-    queryset = LandEdge.objects.existing()
+    model = LandEdge
     filterform = LandEdgeFilterSet
     columns = ['id', 'land_type', 'length']
 
@@ -78,7 +78,7 @@ class LandEdgeFormatList(MapEntityFormat, LandEdgeList):
 
 
 class LandEdgeDetail(MapEntityDetail):
-    queryset = LandEdge.objects.existing()
+    model = LandEdge
 
 
 class LandEdgeDocument(MapEntityDocument):
@@ -91,7 +91,7 @@ class LandEdgeCreate(CreateFromTopologyMixin, MapEntityCreate):
 
 
 class LandEdgeUpdate(MapEntityUpdate):
-    queryset = LandEdge.objects.existing()
+    model = LandEdge
     form_class = LandEdgeForm
 
 
@@ -100,12 +100,12 @@ class LandEdgeDelete(MapEntityDelete):
 
 
 class CompetenceEdgeLayer(MapEntityLayer):
-    queryset = CompetenceEdge.objects.existing()
+    model = CompetenceEdge
     properties = ['color_index', 'name']
 
 
 class CompetenceEdgeList(MapEntityList):
-    queryset = CompetenceEdge.objects.existing()
+    model = CompetenceEdge
     filterform = CompetenceEdgeFilterSet
     columns = ['id', 'organization', 'length']
 
@@ -123,7 +123,7 @@ class CompetenceEdgeFormatList(MapEntityFormat, CompetenceEdgeList):
 
 
 class CompetenceEdgeDetail(MapEntityDetail):
-    queryset = CompetenceEdge.objects.existing()
+    model = CompetenceEdge
 
 
 class CompetenceEdgeDocument(MapEntityDocument):
@@ -136,7 +136,7 @@ class CompetenceEdgeCreate(CreateFromTopologyMixin, MapEntityCreate):
 
 
 class CompetenceEdgeUpdate(MapEntityUpdate):
-    queryset = CompetenceEdge.objects.existing()
+    model = CompetenceEdge
     form_class = CompetenceEdgeForm
 
 
@@ -145,12 +145,12 @@ class CompetenceEdgeDelete(MapEntityDelete):
 
 
 class WorkManagementEdgeLayer(MapEntityLayer):
-    queryset = WorkManagementEdge.objects.existing()
+    model = WorkManagementEdge
     properties = ['color_index', 'name']
 
 
 class WorkManagementEdgeList(MapEntityList):
-    queryset = WorkManagementEdge.objects.existing()
+    model = WorkManagementEdge
     filterform = WorkManagementEdgeFilterSet
     columns = ['id', 'organization', 'length']
 
@@ -168,7 +168,7 @@ class WorkManagementEdgeFormatList(MapEntityFormat, WorkManagementEdgeList):
 
 
 class WorkManagementEdgeDetail(MapEntityDetail):
-    queryset = WorkManagementEdge.objects.existing()
+    model = WorkManagementEdge
 
 
 class WorkManagementEdgeDocument(MapEntityDocument):
@@ -181,7 +181,7 @@ class WorkManagementEdgeCreate(CreateFromTopologyMixin, MapEntityCreate):
 
 
 class WorkManagementEdgeUpdate(MapEntityUpdate):
-    queryset = WorkManagementEdge.objects.existing()
+    model = WorkManagementEdge
     form_class = WorkManagementEdgeForm
 
 
@@ -190,12 +190,12 @@ class WorkManagementEdgeDelete(MapEntityDelete):
 
 
 class SignageManagementEdgeLayer(MapEntityLayer):
-    queryset = SignageManagementEdge.objects.existing()
+    model = SignageManagementEdge
     properties = ['color_index', 'name']
 
 
 class SignageManagementEdgeList(MapEntityList):
-    queryset = SignageManagementEdge.objects.existing()
+    model = SignageManagementEdge
     filterform = SignageManagementEdgeFilterSet
     columns = ['id', 'organization', 'length']
 
@@ -213,7 +213,7 @@ class SignageManagementEdgeFormatList(MapEntityFormat, SignageManagementEdgeList
 
 
 class SignageManagementEdgeDetail(MapEntityDetail):
-    queryset = SignageManagementEdge.objects.existing()
+    model = SignageManagementEdge
 
 
 class SignageManagementEdgeDocument(MapEntityDocument):
@@ -226,7 +226,7 @@ class SignageManagementEdgeCreate(CreateFromTopologyMixin, MapEntityCreate):
 
 
 class SignageManagementEdgeUpdate(MapEntityUpdate):
-    queryset = SignageManagementEdge.objects.existing()
+    model = SignageManagementEdge
     form_class = SignageManagementEdgeForm
 
 

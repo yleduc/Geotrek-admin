@@ -130,8 +130,8 @@ class InterventionTest(TestCase):
         interv.set_topology(infra)
         interv.save()
         infra.delete()
-        self.assertEqual(Infrastructure.objects.existing().count(), 0)
-        self.assertEqual(Intervention.objects.existing().count(), 0)
+        self.assertEqual(Infrastructure.objects.count(), 0)
+        self.assertEqual(Intervention.objects.count(), 0)
 
     def test_denormalized_fields(self):
         infra = InfrastructureFactory.create()

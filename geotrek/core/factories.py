@@ -118,7 +118,6 @@ class TopologyFactory(factory.DjangoModelFactory):
     # Factory
     # troncons (M2M)
     offset = 0
-    deleted = False
 
     # Trigger will override :
     date_insert = dbnow()

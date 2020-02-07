@@ -17,16 +17,4 @@ urlpatterns = [
         name="dive_service_geojson"),
 ]
 
-
-class DiveEntityOptions(PublishableEntityOptions):
-    # document_public_view = DiveDocumentPublic
-    # markup_public_view = DiveMarkupPublic
-
-    # def get_serializer(self):
-    #     return diving_serializers.DiveSerializer
-
-    def get_queryset(self):
-        return self.model.objects.existing()
-
-
-urlpatterns += registry.register(models.Dive, DiveEntityOptions, menu=settings.DIVE_MODEL_ENABLED)
+urlpatterns += registry.register(models.Dive, PublishableEntityOptions, menu=settings.DIVE_MODEL_ENABLED)

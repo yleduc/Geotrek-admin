@@ -14,7 +14,7 @@ class TrekFilterSet(MapEntityFilterSet):
 
 
 class POITrekFilter(TopologyFilter):
-    queryset = Trek.objects.existing()
+    model = Trek
 
 
 class POIFilterSet(MapEntityFilterSet):

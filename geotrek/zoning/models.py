@@ -58,7 +58,7 @@ class RestrictedAreaEdge(Topology):
                                         db_column='zone')
 
     # Override default manager
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 'f_t_zonage'
@@ -70,8 +70,7 @@ class RestrictedAreaEdge(Topology):
 
     @classmethod
     def path_area_edges(cls, path):
-        return cls.objects.existing()\
-                          .select_related('restricted_area')\
+        return cls.objects.select_related('restricted_area')\
                           .select_related('restricted_area__area_type')\
                           .filter(aggregations__path=path).distinct('pk')
 
@@ -138,7 +137,7 @@ class CityEdge(Topology):
     city = models.ForeignKey(City, verbose_name=_("City"), db_column='commune')
 
     # Override default manager
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 'f_t_commune'
@@ -150,7 +149,7 @@ class CityEdge(Topology):
 
     @classmethod
     def path_city_edges(cls, path):
-        return cls.objects.existing().select_related('city').filter(aggregations__path=path).distinct('pk')
+        return cls.objects.select_related('city').filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_city_edges(cls, topology):
@@ -202,7 +201,7 @@ class DistrictEdge(Topology):
     district = models.ForeignKey(District, verbose_name=_("District"), db_column='secteur')
 
     # Override default manager
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 'f_t_secteur'
@@ -214,7 +213,7 @@ class DistrictEdge(Topology):
 
     @classmethod
     def path_district_edges(cls, path):
-        return cls.objects.existing().select_related('district').filter(aggregations__path=path).distinct('pk')
+        return cls.objects.select_related('district').filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_district_edges(cls, topology):

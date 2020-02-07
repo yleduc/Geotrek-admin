@@ -48,9 +48,6 @@ class TrekEntityOptions(AltimetryEntityOptions, PublishableEntityOptions):
     def get_serializer(self):
         return trekking_serializers.TrekSerializer
 
-    def get_queryset(self):
-        return self.model.objects.existing()
-
 
 class POIEntityOptions(PublishableEntityOptions):
 

@@ -91,8 +91,6 @@ def intersecting(cls, obj, distance=None, ordering=True):
     qs = cls.objects
     if not obj.geom:
         return qs.none()
-    if hasattr(qs, 'existing'):
-        qs = qs.existing()
     if distance is None:
         distance = obj.distance(cls)
     if distance:

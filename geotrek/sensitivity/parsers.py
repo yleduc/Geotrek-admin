@@ -32,7 +32,6 @@ class BiodivParser(Parser):
     }
     constant_fields = {
         'published': True,
-        'deleted': False,
     }
 
     def __init__(self, *args, **kwargs):
@@ -144,7 +143,6 @@ class SpeciesSensitiveAreaShapeParser(ShapeParser):
     }
     constant_fields = {
         'published': True,
-        'deleted': False,
     }
     field_options = {
         'species': {'required': True}
@@ -178,7 +176,6 @@ class RegulatorySensitiveAreaShapeParser(ShapeParser):
     }
     constant_fields = {
         'published': True,
-        'deleted': False,
     }
 
     def filter_species(self, src, val):

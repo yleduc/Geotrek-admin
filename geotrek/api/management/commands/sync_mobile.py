@@ -237,7 +237,7 @@ class Command(BaseCommand):
 
     def sync_trekking(self, lang):
         self.sync_geojson(lang, TrekViewSet, 'treks.geojson', type_view={'get': 'list'})
-        treks = trekking_models.Trek.objects.existing().order_by('pk')
+        treks = trekking_models.Trek.objects.order_by('pk')
         treks = treks.filter(**{'published_{lang}'.format(lang=lang): True})
 
         if self.portal:
@@ -323,7 +323,7 @@ class Command(BaseCommand):
         self.close_zip(trekid_zipfile, zipname_trekid)
 
     def sync_treks_media(self):
-        treks = trekking_models.Trek.objects.existing().filter(published=True).order_by('pk')
+        treks = trekking_models.Trek.objects.filter(published=True).order_by('pk')
         if self.portal:
             treks = treks.filter(Q(portal__name__in=self.portal) | Q(portal=None))
 

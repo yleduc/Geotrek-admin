@@ -5,7 +5,6 @@ import datetime
 import hashlib
 
 from django.conf import settings
-from django.db.models import Manager as DefaultManager
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
@@ -35,39 +34,6 @@ class TimeStampedModelMixin(models.Model):
         self.date_insert = fromdb.date_insert
         self.date_update = fromdb.date_update
         return self
-
-
-class NoDeleteMixin(models.Model):
-    deleted = models.BooleanField(editable=False, default=False, db_column='supprime', verbose_name=_("Deleted"))
-
-    def delete(self, force=False, using=None, **kwargs):
-        if force:
-            super(NoDeleteMixin, self).delete(using, **kwargs)
-        else:
-            self.deleted = True
-            self.save(using=using)
-
-    class Meta:
-        abstract = True
-
-    def reload(self, fromdb):
-        """Reload fields computed at DB-level (triggers)
-        """
-        self.deleted = fromdb.deleted
-        return self
-
-    @classmethod
-    def get_manager_cls(cls, parent_mgr_cls=DefaultManager):
-
-        class NoDeleteManager(parent_mgr_cls):
-            # Use this manager when walking through FK/M2M relationships
-            use_for_related_fields = True
-
-            # Filter out deleted objects
-            def existing(self):
-                return self.get_queryset().filter(deleted=False)
-
-        return NoDeleteManager
 
 
 class PicturesMixin(object):

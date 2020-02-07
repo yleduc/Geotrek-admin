@@ -14,9 +14,6 @@ class SensitiveAreaEntityOptions(PublishableEntityOptions):
     def get_serializer(self):
         return serializers.SensitiveAreaSerializer
 
-    def get_queryset(self):
-        return self.model.objects.existing()
-
 
 urlpatterns = [
     url(r'^api/(?P<lang>\w\w)/sensitiveareas/(?P<pk>\d+).kml$',

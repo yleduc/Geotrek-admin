@@ -12,7 +12,7 @@ from geotrek.trekking import models as trekking_models
 class TrekViewSet(api_viewsets.GeotrekViewset):
     serializer_class = api_serializers.TrekListSerializer
     serializer_detail_class = api_serializers.TrekDetailSerializer
-    queryset = trekking_models.Trek.objects.existing() \
+    queryset = trekking_models.Trek.objects \
         .select_related('topo_object', 'difficulty', 'practice') \
         .prefetch_related('topo_object__aggregations', 'themes', 'networks', 'attachments') \
         .annotate(geom2d_transformed=Transform(F('geom'), settings.API_SRID),
@@ -38,7 +38,7 @@ class TrekViewSet(api_viewsets.GeotrekViewset):
         Get practices used by Trek instances
         """
         data = api_serializers.TrekPracticeSerializer(trekking_models.Practice.objects.filter(
-            pk__in=trekking_models.Trek.objects.existing().values_list('practice_id', flat=True)),
+            pk__in=trekking_models.Trek.objects.values_list('practice_id', flat=True)),
             many=True,
             context={'request': request}).data
         return response.Response(data)
@@ -59,7 +59,7 @@ class TrekViewSet(api_viewsets.GeotrekViewset):
         Get themes used by Trek instances
         """
         data = api_serializers.TrekThemeSerializer(trekking_models.Theme.objects.filter(
-            pk__in=trekking_models.Trek.objects.existing().values_list('themes', flat=True)),
+            pk__in=trekking_models.Trek.objects.values_list('themes', flat=True)),
             many=True,
             context={'request': request}).data
         return response.Response(data)
@@ -80,7 +80,7 @@ class TrekViewSet(api_viewsets.GeotrekViewset):
         Get networks used by Trek instances
         """
         data = api_serializers.TrekNetworkSerializer(trekking_models.TrekNetwork.objects.filter(
-            pk__in=trekking_models.Trek.objects.existing().values_list('networks', flat=True)),
+            pk__in=trekking_models.Trek.objects.values_list('networks', flat=True)),
             many=True,
             context={'request': request}).data
         return response.Response(data)
@@ -100,7 +100,7 @@ class TrekViewSet(api_viewsets.GeotrekViewset):
         Get difficulties used by Trek instances
         """
         data = api_serializers.DifficultySerializer(trekking_models.DifficultyLevel.objects.filter(
-            pk__in=trekking_models.Trek.objects.existing().values_list('difficulty_id', flat=True)),
+            pk__in=trekking_models.Trek.objects.values_list('difficulty_id', flat=True)),
             many=True,
             context={'request': request}).data
         return response.Response(data)
@@ -116,7 +116,7 @@ class TourViewSet(TrekViewSet):
 class POIViewSet(api_viewsets.GeotrekViewset):
     serializer_class = api_serializers.POIListSerializer
     serializer_detail_class = api_serializers.POIDetailSerializer
-    queryset = trekking_models.POI.objects.existing() \
+    queryset = trekking_models.POI.objects \
         .select_related('topo_object', 'type', ) \
         .prefetch_related('topo_object__aggregations', 'attachments') \
         .annotate(geom2d_transformed=Transform(F('geom'), settings.API_SRID),
@@ -140,7 +140,7 @@ class POIViewSet(api_viewsets.GeotrekViewset):
         Get POI types used by POI instances
         """
         data = api_serializers.POITypeSerializer(
-            trekking_models.POIType.objects.filter(pk__in=trekking_models.POI.objects.existing()
+            trekking_models.POIType.objects.filter(pk__in=trekking_models.POI.objects
                                                    .values_list('type_id', flat=True)),
             many=True,
             context={'request': request}).data

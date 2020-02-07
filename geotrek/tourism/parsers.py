@@ -480,7 +480,6 @@ class EspritParcParser(AttachmentParserMixin, Parser):
     constant_fields = {
         'published': True,
         'approved': True,
-        'deleted': False,
     }
 
     field_options = {
@@ -596,7 +595,6 @@ class TouristicContentTourInSoftParser(TouristicContentMixin, TourInSoftParser):
 
     constant_fields = {
         'published': True,
-        'deleted': False,
     }
 
     fields = {
@@ -690,7 +688,6 @@ class TouristicEventTourInSoftParser(TourInSoftParser):
 
     constant_fields = {
         'published': True,
-        'deleted': False,
     }
 
     fields = {

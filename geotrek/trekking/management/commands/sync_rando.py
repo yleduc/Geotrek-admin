@@ -498,11 +498,10 @@ class Command(BaseCommand):
             self.sync_pictograms(lang, diving_models.Difficulty)
             self.sync_pictograms(lang, diving_models.Level)
 
-        treks = trekking_models.Trek.objects.existing().order_by('pk')
+        treks = trekking_models.Trek.objects.order_by('pk')
         treks = treks.filter(
             Q(**{'published_{lang}'.format(lang=lang): True})
-            | Q(**{'trek_parents__parent__published_{lang}'.format(lang=lang): True,
-                   'trek_parents__parent__deleted': False})
+            | Q(**{'trek_parents__parent__published_{lang}'.format(lang=lang): True})
         )
 
         if self.source:
@@ -555,7 +554,7 @@ class Command(BaseCommand):
                     }
                 )
 
-            treks = trekking_models.Trek.objects.existing().order_by('pk')
+            treks = trekking_models.Trek.objects.order_by('pk')
             if self.source:
                 treks = treks.filter(source__name__in=self.source)
 
@@ -640,7 +639,7 @@ class Command(BaseCommand):
     def sync_sensitiveareas(self, lang):
         self.sync_geojson(lang, sensitivity_views.SensitiveAreaViewSet, 'sensitiveareas.geojson',
                           params={'practices': 'Terrestre'})
-        for area in sensitivity_models.SensitiveArea.objects.existing().filter(published=True):
+        for area in sensitivity_models.SensitiveArea.objects.filter(published=True):
             name = os.path.join('api', lang, 'sensitiveareas', '{obj.pk}.kml'.format(obj=area))
             self.sync_view(lang, sensitivity_views.SensitiveAreaKMLDetail.as_view(), name, pk=area.pk)
             self.sync_media_file(lang, area.species.pictogram)
@@ -662,7 +661,7 @@ class Command(BaseCommand):
     def sync_dives(self, lang):
         self.sync_geojson(lang, diving_views.DiveViewSet, 'dives.geojson')
 
-        dives = diving_models.Dive.objects.existing().order_by('pk')
+        dives = diving_models.Dive.objects.order_by('pk')
         dives = dives.filter(**{'published_{lang}'.format(lang=lang): True})
 
         if self.source:
@@ -703,7 +702,7 @@ class Command(BaseCommand):
         for category in tourism_models.TouristicContentCategory.objects.all():
             self.sync_media_file(lang, category.pictogram, zipfile=self.zipfile)
 
-        contents = tourism_models.TouristicContent.objects.existing().order_by('pk')
+        contents = tourism_models.TouristicContent.objects.order_by('pk')
         contents = contents.filter(**{'published_{lang}'.format(lang=lang): True})
 
         if self.source:
@@ -715,7 +714,7 @@ class Command(BaseCommand):
         for content in contents:
             self.sync_content(lang, content)
 
-        events = tourism_models.TouristicEvent.objects.existing().order_by('pk')
+        events = tourism_models.TouristicEvent.objects.order_by('pk')
         events = events.filter(**{'published_{lang}'.format(lang=lang): True})
 
         if self.source:

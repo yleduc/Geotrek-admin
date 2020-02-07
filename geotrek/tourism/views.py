@@ -39,12 +39,12 @@ logger = logging.getLogger(__name__)
 
 
 class TouristicContentLayer(MapEntityLayer):
-    queryset = TouristicContent.objects.existing()
+    model = TouristicContent
     properties = ['name']
 
 
 class TouristicContentList(MapEntityList):
-    queryset = TouristicContent.objects.existing()
+    model = TouristicContent
     filterform = TouristicContentFilterSet
     columns = ['id', 'name', 'category']
 
@@ -64,7 +64,7 @@ class TouristicContentFormatList(MapEntityFormat, TouristicContentList):
 
 
 class TouristicContentDetail(MapEntityDetail):
-    queryset = TouristicContent.objects.existing()
+    model = TouristicContent
 
     def get_context_data(self, *args, **kwargs):
         context = super(TouristicContentDetail, self).get_context_data(*args, **kwargs)
@@ -90,7 +90,7 @@ class TouristicContentCreate(MapEntityCreate):
 
 
 class TouristicContentUpdate(MapEntityUpdate):
-    queryset = TouristicContent.objects.existing()
+    model = TouristicContent
     form_class = TouristicContentForm
 
     @same_structure_required('tourism:touristiccontent_detail')
@@ -107,11 +107,11 @@ class TouristicContentDelete(MapEntityDelete):
 
 
 class TouristicContentDocument(MapEntityDocument):
-    queryset = TouristicContent.objects.existing()
+    model = TouristicContent
 
 
 class TouristicContentDocumentPublicMixin(object):
-    queryset = TouristicContent.objects.existing()
+    model = TouristicContent
 
     def get_context_data(self, **kwargs):
         context = super(TouristicContentDocumentPublicMixin, self).get_context_data(**kwargs)
@@ -159,12 +159,12 @@ class TouristicContentMeta(DetailView):
 
 
 class TouristicEventLayer(MapEntityLayer):
-    queryset = TouristicEvent.objects.existing()
+    model = TouristicEvent
     properties = ['name']
 
 
 class TouristicEventList(MapEntityList):
-    queryset = TouristicEvent.objects.existing()
+    model = TouristicEvent
     filterform = TouristicEventFilterSet
     columns = ['id', 'name', 'type', 'begin_date', 'end_date']
 
@@ -182,7 +182,7 @@ class TouristicEventFormatList(MapEntityFormat, TouristicEventList):
 
 
 class TouristicEventDetail(MapEntityDetail):
-    queryset = TouristicEvent.objects.existing()
+    model = TouristicEvent
 
     def get_context_data(self, *args, **kwargs):
         context = super(TouristicEventDetail, self).get_context_data(*args, **kwargs)
@@ -196,7 +196,7 @@ class TouristicEventCreate(MapEntityCreate):
 
 
 class TouristicEventUpdate(MapEntityUpdate):
-    queryset = TouristicEvent.objects.existing()
+    model = TouristicEvent
     form_class = TouristicEventForm
 
     @same_structure_required('tourism:touristicevent_detail')
@@ -213,11 +213,11 @@ class TouristicEventDelete(MapEntityDelete):
 
 
 class TouristicEventDocument(MapEntityDocument):
-    queryset = TouristicEvent.objects.existing()
+    model = TouristicEvent
 
 
 class TouristicEventDocumentPublicMixin(object):
-    queryset = TouristicEvent.objects.existing()
+    model = TouristicEvent
 
     def get_context_data(self, **kwargs):
         context = super(TouristicEventDocumentPublicMixin, self).get_context_data(**kwargs)
@@ -269,7 +269,7 @@ class TouristicContentViewSet(MapEntityViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def get_queryset(self):
-        qs = TouristicContent.objects.existing()
+        qs = TouristicContent.objects.all()
         qs = qs.filter(published=True)
 
         if 'source' in self.request.GET:
@@ -304,7 +304,7 @@ class TouristicEventViewSet(MapEntityViewSet):
     filter_class = TouristicEventApiFilterSet
 
     def get_queryset(self):
-        qs = TouristicEvent.objects.existing()
+        qs = TouristicEvent.objects.all()
         qs = qs.filter(published=True)
 
         if 'source' in self.request.GET:
@@ -351,7 +351,7 @@ class TrekInformationDeskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         pk = self.kwargs['pk']
         try:
-            trek = Trek.objects.existing().get(pk=pk)
+            trek = Trek.objects.get(pk=pk)
         except Trek.DoesNotExist:
             raise Http404
         return trek.information_desks.all().transform(settings.API_SRID, field_name='geom')
@@ -369,7 +369,7 @@ class TrekTouristicContentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         try:
-            trek = Trek.objects.existing().get(pk=self.kwargs['pk'])
+            trek = Trek.objects.get(pk=self.kwargs['pk'])
 
         except Trek.DoesNotExist:
             raise Http404
@@ -402,7 +402,7 @@ class TrekTouristicEventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         try:
-            trek = Trek.objects.existing().get(pk=self.kwargs['pk'])
+            trek = Trek.objects.get(pk=self.kwargs['pk'])
 
         except Trek.DoesNotExist:
             raise Http404
@@ -434,7 +434,7 @@ if 'geotrek.diving' in settings.INSTALLED_APPS:
 
         def get_queryset(self):
             try:
-                dive = Dive.objects.existing().get(pk=self.kwargs['pk'])
+                dive = Dive.objects.get(pk=self.kwargs['pk'])
 
             except Dive.DoesNotExist:
                 raise Http404
@@ -466,7 +466,7 @@ if 'geotrek.diving' in settings.INSTALLED_APPS:
 
         def get_queryset(self):
             try:
-                dive = Dive.objects.existing().get(pk=self.kwargs['pk'])
+                dive = Dive.objects.get(pk=self.kwargs['pk'])
 
             except Dive.DoesNotExist:
                 raise Http404

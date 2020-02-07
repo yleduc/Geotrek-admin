@@ -45,7 +45,7 @@ class CreateFromTopologyMixin(object):
         pk = self.request.GET.get('topology')
         if pk:
             try:
-                return Topology.objects.existing().get(pk=pk)
+                return Topology.objects.get(pk=pk)
             except Topology.DoesNotExist:
                 logger.warning("Intervention on unknown topology %s" % pk)
         return None
@@ -281,12 +281,12 @@ def get_graph_json(request):
 
 
 class TrailLayer(MapEntityLayer):
-    queryset = Trail.objects.existing()
+    model = Trail
     properties = ['name']
 
 
 class TrailList(MapEntityList):
-    queryset = Trail.objects.existing()
+    model = Trail
     filterform = TrailFilterSet
     columns = ['id', 'name', 'departure', 'arrival', 'length']
 
@@ -304,7 +304,7 @@ class TrailFormatList(MapEntityFormat, TrailList):
 
 
 class TrailDetail(MapEntityDetail):
-    queryset = Trail.objects.existing()
+    model = Trail
 
     def get_context_data(self, *args, **kwargs):
         context = super(TrailDetail, self).get_context_data(*args, **kwargs)
@@ -313,7 +313,7 @@ class TrailDetail(MapEntityDetail):
 
 
 class TrailGPXDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
-    queryset = Trail.objects.existing()
+    model = Trail
 
     def render_to_response(self, context):
         gpx_serializer = GPXSerializer()
@@ -324,7 +324,7 @@ class TrailGPXDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
 
 
 class TrailKMLDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
-    queryset = Trail.objects.existing()
+    model = Trail
 
     def render_to_response(self, context):
         response = HttpResponse(self.object.kml(),
@@ -334,7 +334,7 @@ class TrailKMLDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
 
 
 class TrailDocument(MapEntityDocument):
-    queryset = Trail.objects.existing()
+    model = Trail
 
 
 class TrailCreate(CreateFromTopologyMixin, MapEntityCreate):
@@ -343,7 +343,7 @@ class TrailCreate(CreateFromTopologyMixin, MapEntityCreate):
 
 
 class TrailUpdate(MapEntityUpdate):
-    queryset = Trail.objects.existing()
+    model = Trail
     form_class = TrailForm
 
     @same_structure_required('core:trail_detail')
@@ -352,7 +352,7 @@ class TrailUpdate(MapEntityUpdate):
 
 
 class TrailDelete(MapEntityDelete):
-    queryset = Trail.objects.existing()
+    model = Trail
 
     @same_structure_required('core:trail_detail')
     def dispatch(self, *args, **kwargs):

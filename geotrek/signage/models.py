@@ -8,7 +8,7 @@ from django.conf import settings
 from mapentity.models import MapEntityMixin
 
 from geotrek.authent.models import StructureOrNoneRelated, StructureRelated
-from geotrek.common.mixins import NoDeleteMixin, OptionalPictogramMixin
+from geotrek.common.mixins import OptionalPictogramMixin
 from geotrek.common.models import Organism
 from geotrek.common.utils import classproperty, format_coordinates
 from geotrek.core.models import Topology, Path
@@ -63,7 +63,7 @@ class SignageGISManager(gismodels.GeoManager):
 
 class Signage(MapEntityMixin, BaseInfrastructure):
     """ An infrastructure in the park, which is of type SIGNAGE """
-    objects = BaseInfrastructure.get_manager_cls(SignageGISManager)()
+    objects = SignageGISManager()
     code = models.CharField(verbose_name=_("Code"), max_length=250, blank=True, null=True,
                             db_column='code')
     manager = models.ForeignKey(Organism, db_column='gestionnaire', verbose_name=_("Manager"), null=True, blank=True)
@@ -80,7 +80,7 @@ class Signage(MapEntityMixin, BaseInfrastructure):
 
     @classmethod
     def path_signages(cls, path):
-        return cls.objects.existing().filter(aggregations__path=path).distinct('pk')
+        return cls.objects.filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_signages(cls, topology):
@@ -88,7 +88,7 @@ class Signage(MapEntityMixin, BaseInfrastructure):
             qs = cls.overlapping(topology)
         else:
             area = topology.geom.buffer(settings.TREK_SIGNAGE_INTERSECTION_MARGIN)
-            qs = cls.objects.existing().filter(geom__intersects=area)
+            qs = cls.objects.filter(geom__intersects=area)
         return qs
 
     @classmethod
@@ -97,7 +97,7 @@ class Signage(MapEntityMixin, BaseInfrastructure):
 
     @property
     def order_blades(self):
-        return self.blade_set.existing().order_by('number')
+        return self.blade_set.order_by('number')
 
     @property
     def gps_value(self):
@@ -166,7 +166,7 @@ class BladeType(StructureOrNoneRelated):
         return self.label
 
 
-class Blade(NoDeleteMixin, MapEntityMixin, StructureRelated):
+class Blade(MapEntityMixin, StructureRelated):
     signage = models.ForeignKey(Signage, db_column='signaletique', verbose_name=_("Signage"),
                                 on_delete=models.PROTECT)
     number = models.CharField(verbose_name=_("Number"), max_length=250, db_column='numero')
@@ -178,7 +178,8 @@ class Blade(NoDeleteMixin, MapEntityMixin, StructureRelated):
     condition = models.ForeignKey(InfrastructureCondition, db_column='etat', verbose_name=_("Condition"),
                                   null=True, blank=True, on_delete=models.PROTECT)
     topology = models.ForeignKey(Topology, related_name="blades_set", verbose_name=_("Blades"))
-    objects = NoDeleteMixin.get_manager_cls(BladeManager)()
+
+    objects = BladeManager()
 
     class Meta:
         db_table = 's_t_lame'

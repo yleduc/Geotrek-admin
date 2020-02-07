@@ -13,8 +13,6 @@ from mapentity.forms import MapEntityForm
 
 from geotrek.authent.models import default_structure, StructureRelated, StructureOrNoneRelated
 
-from .mixins import NoDeleteMixin
-
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div, Submit
 from crispy_forms.bootstrap import FormActions
@@ -61,8 +59,6 @@ class CommonForm(MapEntityForm):
             field.queryset = field.queryset.filter(structure=self.user.profile.structure)
         if issubclass(model, StructureOrNoneRelated) and model.check_structure_in_forms:
             field.queryset = field.queryset.filter(Q(structure=self.user.profile.structure) | Q(structure=None))
-        if issubclass(model, NoDeleteMixin):
-            field.queryset = field.queryset.filter(deleted=False)
 
     def __init__(self, *args, **kwargs):
         self.fieldslayout = deepcopy(self.fieldslayout)

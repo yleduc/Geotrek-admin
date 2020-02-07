@@ -25,7 +25,7 @@ class TrekViewSet(DetailSerializerMixin, viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self, *args, **kwargs):
         lang = self.request.LANGUAGE_CODE
-        queryset = trekking_models.Trek.objects.existing()\
+        queryset = trekking_models.Trek.objects \
             .select_related('topo_object') \
             .prefetch_related('topo_object__aggregations', 'attachments') \
             .order_by('pk').annotate(length_2d_m=Length('geom'))
@@ -39,8 +39,7 @@ class TrekViewSet(DetailSerializerMixin, viewsets.ReadOnlyModelViewSet):
         return queryset.annotate(start_point=Transform(StartPoint('geom'), settings.API_SRID),
                                  end_point=Transform(EndPoint('geom'), settings.API_SRID)). \
             filter(Q(**{'published_{lang}'.format(lang=lang): True})
-                   | Q(**{'trek_parents__parent__published_{lang}'.format(lang=lang): True,
-                          'trek_parents__parent__deleted': False})).distinct()
+                   | Q(**{'trek_parents__parent__published_{lang}'.format(lang=lang): True})).distinct()
 
     def get_serializer_context(self):
         return {'root_pk': self.request.GET.get('root_pk')}

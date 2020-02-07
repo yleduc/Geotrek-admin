@@ -110,14 +110,12 @@ class TrekTest(TranslationResetMixin, TestCase):
 
         # Everything should be all right before delete
         self.assertTrue(t.published)
-        self.assertFalse(t.deleted)
         self.assertEqual(t.aggregations.count(), 2)
 
         # When a path is deleted
         p1.delete()
         t = Trek.objects.get(pk=t.pk)
         self.assertFalse(t.published)
-        self.assertFalse(t.deleted)
         self.assertEqual(t.aggregations.count(), 1)
 
         # Reset published status
@@ -126,10 +124,7 @@ class TrekTest(TranslationResetMixin, TestCase):
 
         # When all paths are deleted
         p2.delete()
-        t = Trek.objects.get(pk=t.pk)
-        self.assertFalse(t.published)
-        self.assertTrue(t.deleted)
-        self.assertEqual(t.aggregations.count(), 0)
+        self.assertIsNone(Trek.objects.get(pk=t.pk).geom)
 
     def test_treks_are_sorted_by_name(self):
         TrekFactory.create(name='Cb')

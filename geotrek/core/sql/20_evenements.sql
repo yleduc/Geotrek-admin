@@ -16,7 +16,6 @@ ALTER TABLE e_t_evenement ALTER COLUMN denivelee_negative SET DEFAULT 0;
 
 
 ALTER TABLE e_t_evenement DROP CONSTRAINT IF EXISTS e_t_evenement_geom_not_empty;
-ALTER TABLE e_t_evenement ADD CONSTRAINT e_t_evenement_geom_not_empty CHECK (supprime OR (geom IS NOT NULL));
 
 
 -------------------------------------------------------------------------------
@@ -96,7 +95,7 @@ BEGIN
 
     IF t_count = 0 THEN
         -- No more troncons, close this topology
-        UPDATE e_t_evenement SET supprime = true, geom = NULL, longueur = 0 WHERE id = eid;
+        UPDATE e_t_evenement SET geom = NULL, longueur = 0 WHERE id = eid;
     ELSIF (NOT lines_only AND t_count = 1) OR points_only THEN
         -- Special case: the topology describe a point on the path
         -- Note: We are faking a M-geometry in order to use LocateAlong.

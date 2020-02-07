@@ -8,7 +8,7 @@ from colorfield.fields import ColorField
 from mapentity.models import MapEntityMixin
 
 from geotrek.authent.models import StructureRelated
-from geotrek.common.mixins import (NoDeleteMixin, TimeStampedModelMixin,
+from geotrek.common.mixins import (TimeStampedModelMixin,
                                    PublishableMixin, PicturesMixin, AddPropertyMixin,
                                    PictogramMixin, OptionalPictogramMixin)
 from geotrek.common.models import Theme
@@ -97,7 +97,7 @@ class Level(OptionalPictogramMixin):
 
 
 class Dive(AddPropertyMixin, PublishableMixin, MapEntityMixin, StructureRelated,
-           TimeStampedModelMixin, PicturesMixin, NoDeleteMixin):
+           TimeStampedModelMixin, PicturesMixin):
     description_teaser = models.TextField(verbose_name=_("Description teaser"), blank=True,
                                           help_text=_("A brief summary"), db_column='chapeau')
     description = models.TextField(verbose_name=_("Description"), blank=True, db_column='description',
@@ -130,7 +130,7 @@ class Dive(AddPropertyMixin, PublishableMixin, MapEntityMixin, StructureRelated,
                                     verbose_name=_("Portal"), db_table='g_r_plongee_portal')
     eid = models.CharField(verbose_name=_("External id"), max_length=1024, blank=True, null=True, db_column='id_externe')
 
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     category_id_prefix = 'D'
 

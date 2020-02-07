@@ -29,9 +29,6 @@ class TouristicContentEntityOptions(PublishableEntityOptions):
     def get_serializer(self):
         return tourism_serializers.TouristicContentSerializer
 
-    def get_queryset(self):
-        return self.model.objects.existing()
-
 
 if settings.TOURISM_ENABLED:
     urlpatterns += registry.register(models.TouristicContent, TouristicContentEntityOptions,
@@ -44,9 +41,6 @@ class TouristicEventEntityOptions(PublishableEntityOptions):
 
     def get_serializer(self):
         return tourism_serializers.TouristicEventSerializer
-
-    def get_queryset(self):
-        return self.model.objects.existing()
 
 
 if settings.TOURISM_ENABLED:

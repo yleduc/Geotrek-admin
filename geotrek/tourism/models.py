@@ -17,7 +17,7 @@ from mapentity.serializers import plain_text, smart_plain_text
 
 from geotrek.authent.models import StructureRelated
 from geotrek.core.models import Topology
-from geotrek.common.mixins import (NoDeleteMixin, TimeStampedModelMixin,
+from geotrek.common.mixins import (TimeStampedModelMixin,
                                    PictogramMixin, OptionalPictogramMixin,
                                    PublishableMixin, PicturesMixin,
                                    AddPropertyMixin)
@@ -265,7 +265,7 @@ class ReservationSystem(models.Model):
 
 
 class TouristicContent(AddPropertyMixin, PublishableMixin, MapEntityMixin, StructureRelated,
-                       TimeStampedModelMixin, PicturesMixin, NoDeleteMixin):
+                       TimeStampedModelMixin, PicturesMixin):
     """ A generic touristic content (accomodation, museum, etc.) in the park
     """
     description_teaser = models.TextField(verbose_name=_("Description teaser"), blank=True,
@@ -305,7 +305,7 @@ class TouristicContent(AddPropertyMixin, PublishableMixin, MapEntityMixin, Struc
                                       blank=True, db_column='id_reservation')
     approved = models.BooleanField(verbose_name=_("Approved"), default=False, db_column='labellise')
 
-    objects = NoDeleteMixin.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 't_t_contenu_touristique'
@@ -402,7 +402,7 @@ class TouristicEventType(OptionalPictogramMixin):
 
 
 class TouristicEvent(AddPropertyMixin, PublishableMixin, MapEntityMixin, StructureRelated,
-                     PicturesMixin, TimeStampedModelMixin, NoDeleteMixin):
+                     PicturesMixin, TimeStampedModelMixin):
     """ A touristic event (conference, workshop, etc.) in the park
     """
     description_teaser = models.TextField(verbose_name=_("Description teaser"), blank=True,
@@ -444,7 +444,7 @@ class TouristicEvent(AddPropertyMixin, PublishableMixin, MapEntityMixin, Structu
     eid = models.CharField(verbose_name=_("External id"), max_length=1024, blank=True, null=True, db_column='id_externe')
     approved = models.BooleanField(verbose_name=_("Approved"), default=False, db_column='labellise')
 
-    objects = NoDeleteMixin.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     category_id_prefix = 'E'
 

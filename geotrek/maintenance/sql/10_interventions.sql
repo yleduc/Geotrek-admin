@@ -25,23 +25,6 @@ CREATE TRIGGER m_t_chantier_date_update_tgr
     BEFORE INSERT OR UPDATE ON m_t_chantier
     FOR EACH ROW EXECUTE PROCEDURE ft_date_update();
 
--------------------------------------------------------------------------------
--- Delete related interventions when an evenement is deleted
--------------------------------------------------------------------------------
-
-DROP TRIGGER IF EXISTS m_t_evenement_interventions_d_tgr ON e_t_evenement;
-
-CREATE OR REPLACE FUNCTION gestion.delete_related_intervention() RETURNS trigger SECURITY DEFINER AS $$
-BEGIN
-    UPDATE m_t_intervention SET supprime = NEW.supprime WHERE topology_id = NEW.id;
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER m_t_evenement_interventions_d_tgr
-AFTER UPDATE OF supprime ON e_t_evenement
-FOR EACH ROW EXECUTE PROCEDURE delete_related_intervention();
-
 
 -------------------------------------------------------------------------------
 -- Denormalized altimetry information

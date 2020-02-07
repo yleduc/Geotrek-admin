@@ -53,7 +53,7 @@ class BaseBladeForm(CommonForm):
             self.helper.form_action += '?signage=%s' % self.signage.pk
         else:
             self.signage = self.instance.signage
-        value_max = self.signage.blade_set.existing().aggregate(max=Max('number'))['max']
+        value_max = self.signage.blade_set.aggregate(max=Max('number'))['max']
         if settings.BLADE_CODE_TYPE == int:
             if not value_max:
                 self.fields['number'].initial = "1"
@@ -72,7 +72,7 @@ class BaseBladeForm(CommonForm):
         return super(CommonForm, self).save(*args, **kwargs)
 
     def clean_number(self):
-        blades = self.signage.blade_set.existing()
+        blades = self.signage.blade_set.all()
         if self.instance.pk:
             blades = blades.exclude(number=self.instance.number)
         already_used = ', '.join([str(number) for number in blades.values_list('number', flat=True)])
@@ -106,7 +106,7 @@ if settings.TREKKING_TOPOLOGY_ENABLED:
                 _("On %s") % _(self.signage.kind.lower()),
                 '<a href="%s">%s</a>' % (self.signage.get_detail_url(), str(self.signage))
             )
-            value_max = self.signage.blade_set.existing().aggregate(max=Max('number'))['max']
+            value_max = self.signage.blade_set.aggregate(max=Max('number'))['max']
             if settings.BLADE_CODE_TYPE == int:
                 if not value_max:
                     self.fields['number'].initial = "1"
@@ -125,7 +125,7 @@ if settings.TREKKING_TOPOLOGY_ENABLED:
             return super(CommonForm, self).save(*args, **kwargs)
 
         def clean_number(self):
-            blades = self.signage.blade_set.existing()
+            blades = self.signage.blade_set.all()
             if self.instance.pk:
                 blades = blades.exclude(number=self.instance.number)
             already_used = ', '.join([str(number) for number in blades.values_list('number', flat=True)])

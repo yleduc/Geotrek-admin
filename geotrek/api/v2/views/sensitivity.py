@@ -32,7 +32,7 @@ class SensitiveAreaViewSet(api_viewsets.GeotrekViewset):
         return api_serializers.override_serializer(format_output, dimension, base_serializer_class)
 
     def get_queryset(self):
-        queryset = sensitivity_models.SensitiveArea.objects.existing() \
+        queryset = sensitivity_models.SensitiveArea.objects \
             .filter(published=True) \
             .select_related('species', 'structure') \
             .prefetch_related('species__practices') \

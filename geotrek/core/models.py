@@ -11,8 +11,7 @@ from mapentity.models import MapEntityMixin
 from mapentity.serializers import plain_text
 
 from geotrek.authent.models import StructureRelated, StructureOrNoneRelated
-from geotrek.common.mixins import (TimeStampedModelMixin, NoDeleteMixin,
-                                   AddPropertyMixin)
+from geotrek.common.mixins import TimeStampedModelMixin, AddPropertyMixin
 from geotrek.common.utils import classproperty
 from geotrek.common.utils.postgresql import debug_pg_notices
 from geotrek.altimetry.models import AltimetryMixin
@@ -325,13 +324,13 @@ class Path(AddPropertyMixin, MapEntityMixin, AltimetryMixin,
         return self.geom.transform(settings.API_SRID, clone=True).extent if self.geom else None
 
 
-class Topology(AddPropertyMixin, AltimetryMixin, TimeStampedModelMixin, NoDeleteMixin):
+class Topology(AddPropertyMixin, AltimetryMixin, TimeStampedModelMixin):
     paths = models.ManyToManyField(Path, db_column='troncons', through='PathAggregation', verbose_name=_("Path"))
     offset = models.FloatField(default=0.0, db_column='decallage', verbose_name=_("Offset"))  # in SRID units
     kind = models.CharField(editable=False, verbose_name=_("Kind"), max_length=32)
 
     # Override default manager
-    objects = NoDeleteMixin.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     geom = models.GeometryField(editable=(not settings.TREKKING_TOPOLOGY_ENABLED),
                                 srid=settings.SRID, null=True,
@@ -389,10 +388,6 @@ class Topology(AddPropertyMixin, AltimetryMixin, TimeStampedModelMixin, NoDelete
                                              end_position=end,
                                              order=order)
 
-        if self.deleted:
-            self.deleted = False
-            self.save(update_fields=['deleted'])
-
         # Since a trigger modifies geom, we reload the object
         if reload:
             self.reload()
@@ -412,11 +407,8 @@ class Topology(AddPropertyMixin, AltimetryMixin, TimeStampedModelMixin, NoDelete
         self.offset = other.offset
         self.save(update_fields=['offset'])
         PathAggregation.objects.filter(topo_object=self).delete()
-        # The previous operation has put deleted = True (in triggers)
-        # and NULL in geom (see update_geometry_of_evenement:: IF t_count = 0)
-        self.deleted = False
         self.geom = other.geom
-        self.save(update_fields=['deleted', 'geom'])
+        self.save(update_fields=['geom'])
 
         # Now copy all agregations from other to self
         aggrs = other.aggregations.all()
@@ -428,7 +420,7 @@ class Topology(AddPropertyMixin, AltimetryMixin, TimeStampedModelMixin, NoDelete
             self.add_path(aggr.path, aggr.start_position, aggr.end_position, aggr.order, reload=False)
         self.reload()
         if delete:
-            other.delete(force=True)  # Really delete it from database
+            other.delete()  # Delete it from database
         return self
 
     def reload(self):
@@ -437,7 +429,10 @@ class Topology(AddPropertyMixin, AltimetryMixin, TimeStampedModelMixin, NoDelete
         """
         if self.pk:
             # Update computed values
-            fromdb = self.__class__.objects.get(pk=self.pk)
+            try:
+                fromdb = self.__class__.objects.get(pk=self.pk)
+            except Topology.DoesNotExist:
+                return None
             self.geom = fromdb.geom
             # /!\ offset may be set by a trigger OR in
             # the django code, reload() will override
@@ -445,7 +440,6 @@ class Topology(AddPropertyMixin, AltimetryMixin, TimeStampedModelMixin, NoDelete
             self.offset = fromdb.offset
             AltimetryMixin.reload(self, fromdb)
             TimeStampedModelMixin.reload(self, fromdb)
-            NoDeleteMixin.reload(self, fromdb)
 
         return self
 
@@ -463,7 +457,7 @@ class Topology(AddPropertyMixin, AltimetryMixin, TimeStampedModelMixin, NoDelete
             if (point_geom_not_set or geom_already_in_db):
                 self.geom = existing.geom
         else:
-            if not self.deleted and self.geom is None:
+            if self.geom is None:
                 # We cannot have NULL geometry. So we use an empty one,
                 # it will be computed or overwritten by triggers.
                 self.geom = fromstr('POINT (0 0)')
@@ -652,7 +646,7 @@ class Trail(MapEntityMixin, Topology, StructureRelated):
         verbose_name_plural = _("Trails")
         ordering = ['name']
 
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     def __str__(self):
         return self.name
@@ -666,7 +660,7 @@ class Trail(MapEntityMixin, Topology, StructureRelated):
 
     @classmethod
     def path_trails(cls, path):
-        trails = cls.objects.existing().filter(aggregations__path=path)
+        trails = cls.objects.filter(aggregations__path=path)
         # The following part prevents conflict with default trail ordering
         # ProgrammingError: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
         return trails.order_by('topo_object').distinct('topo_object')

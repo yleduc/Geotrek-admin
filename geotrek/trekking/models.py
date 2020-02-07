@@ -36,9 +36,7 @@ class TrekOrderedChildManager(models.Manager):
 
     def get_queryset(self):
         # Select treks foreign keys by default
-        qs = super(TrekOrderedChildManager, self).get_queryset().select_related('parent', 'child')
-        # Exclude deleted treks
-        return qs.exclude(parent__deleted=True).exclude(child__deleted=True)
+        return super(TrekOrderedChildManager, self).get_queryset().select_related('parent', 'child')
 
 
 class OrderedTrekChild(models.Model):
@@ -125,7 +123,7 @@ class Trek(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, To
     pois_excluded = models.ManyToManyField('Poi', related_name='excluded_treks', verbose_name=_("Excluded POIs"),
                                            db_table="l_r_troncon_poi_exclus", blank=True)
 
-    objects = Topology.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     category_id_prefix = 'T'
     capture_map_image_waitfor = '.poi_enum_loaded.services_loaded.info_desks_loaded.ref_points_loaded'
@@ -173,7 +171,7 @@ class Trek(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, To
 
     @property
     def related(self):
-        return self.related_treks.exclude(deleted=True).exclude(pk=self.pk).distinct()
+        return self.related_treks.exclude(pk=self.pk).distinct()
 
     @classproperty
     def related_verbose_name(cls):
@@ -266,7 +264,7 @@ class Trek(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, To
 
     @classmethod
     def path_treks(cls, path):
-        treks = cls.objects.existing().filter(aggregations__path=path)
+        treks = cls.objects.filter(aggregations__path=path)
         # The following part prevents conflict with default trek ordering
         # ProgrammingError: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
         return treks.order_by('topo_object').distinct('topo_object')
@@ -277,7 +275,7 @@ class Trek(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, To
             qs = cls.overlapping(topology)
         else:
             area = topology.geom.buffer(settings.TREK_POI_INTERSECTION_MARGIN)
-            qs = cls.objects.existing().filter(geom__intersects=area)
+            qs = cls.objects.filter(geom__intersects=area)
         return qs
 
     @classmethod
@@ -295,7 +293,7 @@ class Trek(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, To
 
     @property
     def parents(self):
-        return Trek.objects.filter(trek_children__child=self, deleted=False)
+        return Trek.objects.filter(trek_children__child=self)
 
     @property
     def parents_id(self):
@@ -304,7 +302,7 @@ class Trek(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, To
 
     @property
     def children(self):
-        return Trek.objects.filter(trek_parents__parent=self, deleted=False).order_by('trek_parents__order')
+        return Trek.objects.filter(trek_parents__parent=self).order_by('trek_parents__order')
 
     @property
     def children_id(self):
@@ -335,14 +333,14 @@ class Trek(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, To
         """
         Dict of parent -> previous child
         """
-        return {parent.id: self.previous_id_for(parent) for parent in self.parents.filter(published=True, deleted=False)}
+        return {parent.id: self.previous_id_for(parent) for parent in self.parents.filter(published=True)}
 
     @property
     def next_id(self):
         """
         Dict of parent -> next child
         """
-        return {parent.id: self.next_id_for(parent) for parent in self.parents.filter(published=True, deleted=False)}
+        return {parent.id: self.next_id_for(parent) for parent in self.parents.filter(published=True)}
 
     def clean(self):
         """
@@ -456,9 +454,7 @@ class TrekRelationshipManager(models.Manager):
 
     def get_queryset(self):
         # Select treks foreign keys by default
-        qs = super(TrekRelationshipManager, self).get_queryset().select_related('trek_a', 'trek_b')
-        # Exclude deleted treks
-        return qs.exclude(trek_a__deleted=True).exclude(trek_b__deleted=True)
+        return super(TrekRelationshipManager, self).get_queryset().select_related('trek_a', 'trek_b')
 
 
 class TrekRelationship(models.Model):
@@ -672,7 +668,7 @@ class POI(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, Top
         verbose_name_plural = _("POI")
 
     # Override default manager
-    objects = Topology.get_manager_cls(POIManager)()
+    objects = POIManager()
 
     # Do no check structure when selecting POIs to exclude
     check_structure_in_forms = False
@@ -700,7 +696,7 @@ class POI(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, Top
 
     @classmethod
     def path_pois(cls, path):
-        return cls.objects.existing().filter(aggregations__path=path).distinct('pk')
+        return cls.objects.filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_pois(cls, topology):
@@ -712,7 +708,7 @@ class POI(StructureRelated, PicturesMixin, PublishableMixin, MapEntityMixin, Top
             qs = cls.overlapping(topology)
         else:
             object_geom = topology.geom.transform(settings.SRID, clone=True).buffer(settings.TREK_POI_INTERSECTION_MARGIN)
-            qs = cls.objects.existing().filter(geom__intersects=object_geom)
+            qs = cls.objects.filter(geom__intersects=object_geom)
             if topology.geom.geom_type == 'LineString':
                 qs = qs.annotate(locate=LineLocatePoint(Transform(Value(topology.geom.ewkt,
                                                                         output_field=models.GeometryField()),
@@ -802,7 +798,7 @@ class Service(StructureRelated, MapEntityMixin, Topology):
         verbose_name_plural = _("Services")
 
     # Override default manager
-    objects = Topology.get_manager_cls(ServiceManager)()
+    objects = ServiceManager()
 
     def __str__(self):
         return str(self.type)
@@ -838,7 +834,7 @@ class Service(StructureRelated, MapEntityMixin, Topology):
 
     @classmethod
     def path_services(cls, path):
-        return cls.objects.existing().filter(aggregations__path=path).distinct('pk')
+        return cls.objects.filter(aggregations__path=path).distinct('pk')
 
     @classmethod
     def topology_services(cls, topology):
@@ -846,7 +842,7 @@ class Service(StructureRelated, MapEntityMixin, Topology):
             qs = cls.overlapping(topology)
         else:
             area = topology.geom.buffer(settings.TREK_POI_INTERSECTION_MARGIN)
-            qs = cls.objects.existing().filter(geom__intersects=area)
+            qs = cls.objects.filter(geom__intersects=area)
         if isinstance(topology, Trek):
             qs = qs.filter(type__practices=topology.practice)
         return qs

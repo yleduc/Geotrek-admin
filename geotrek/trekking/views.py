@@ -94,11 +94,11 @@ class FlattenPicturesMixin(object):
 
 class TrekLayer(MapEntityLayer):
     properties = ['name', 'published']
-    queryset = Trek.objects.existing()
+    model = Trek
 
 
 class TrekList(FlattenPicturesMixin, MapEntityList):
-    queryset = Trek.objects.existing()
+    model = Trek
     filterform = TrekFilterSet
     columns = ['id', 'name', 'duration', 'difficulty', 'departure', 'thumbnail']
 
@@ -122,7 +122,7 @@ class TrekFormatList(MapEntityFormat, TrekList):
 
 
 class TrekGPXDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
-    queryset = Trek.objects.existing()
+    model = Trek
 
     def render_to_response(self, context):
         gpx_serializer = TrekGPXSerializer()
@@ -133,7 +133,7 @@ class TrekGPXDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
 
 
 class TrekKMLDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
-    queryset = Trek.objects.existing()
+    model = Trek
 
     def render_to_response(self, context):
         trek = self.get_object()
@@ -143,7 +143,7 @@ class TrekKMLDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
 
 
 class TrekDetail(MapEntityDetail):
-    queryset = Trek.objects.existing()
+    model = Trek
 
     @property
     def icon_sizes(self):
@@ -170,7 +170,7 @@ class TrekDetail(MapEntityDetail):
 
 
 class TrekMapImage(MapEntityMapImage):
-    queryset = Trek.objects.existing()
+    model = Trek
 
     def dispatch(self, *args, **kwargs):
         lang = kwargs.pop('lang')
@@ -181,11 +181,11 @@ class TrekMapImage(MapEntityMapImage):
 
 
 class TrekDocument(MapEntityDocument):
-    queryset = Trek.objects.existing()
+    model = Trek
 
 
 class TrekDocumentPublicMixin(object):
-    queryset = Trek.objects.existing()
+    model = Trek
 
     def get_context_data(self, **kwargs):
         context = super(TrekDocumentPublicMixin, self).get_context_data(**kwargs)
@@ -251,7 +251,7 @@ class TrekCreate(TrekRelationshipFormsetMixin, CreateFromTopologyMixin, MapEntit
 
 
 class TrekUpdate(TrekRelationshipFormsetMixin, MapEntityUpdate):
-    queryset = Trek.objects.existing()
+    model = Trek
     form_class = TrekForm
 
     @same_structure_required('trekking:trek_detail')
@@ -281,12 +281,12 @@ class TrekMeta(DetailView):
 
 
 class POILayer(MapEntityLayer):
-    queryset = POI.objects.existing()
+    model = POI
     properties = ['name', 'published']
 
 
 class POIList(FlattenPicturesMixin, MapEntityList):
-    queryset = POI.objects.existing()
+    model = POI
     filterform = POIFilterSet
     columns = ['id', 'name', 'type', 'thumbnail']
 
@@ -317,13 +317,13 @@ class POIFormatList(MapEntityFormat, POIList):
         for attrname, land_layer in land_layers:
             denormalized[attrname] = {}
             for d in land_layer.objects.all():
-                overlapping = POI.objects.existing().filter(geom__within=d.geom)
+                overlapping = POI.objects.filter(geom__within=d.geom)
                 for pid in overlapping.values_list('id', flat=True):
                     denormalized[attrname].setdefault(pid, []).append(d)
 
         # Same for treks
         denormalized['treks'] = {}
-        for d in Trek.objects.existing():
+        for d in Trek.objects.all():
             for pid in d.pois.all():
                 denormalized['treks'].setdefault(pid, []).append(d)
 
@@ -336,7 +336,7 @@ class POIFormatList(MapEntityFormat, POIList):
 
 
 class POIDetail(MapEntityDetail):
-    queryset = POI.objects.existing()
+    model = POI
 
     def get_context_data(self, *args, **kwargs):
         context = super(POIDetail, self).get_context_data(*args, **kwargs)
@@ -354,7 +354,7 @@ class POICreate(MapEntityCreate):
 
 
 class POIUpdate(MapEntityUpdate):
-    queryset = POI.objects.existing()
+    model = POI
     form_class = POIForm
 
     @same_structure_required('trekking:poi_detail')
@@ -391,7 +391,7 @@ class TrekViewSet(MapEntityViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def get_queryset(self):
-        qs = self.model.objects.existing()
+        qs = self.model.objects.all()
         qs = qs.select_related('structure', 'difficulty', 'practice', 'route')
         qs = qs.prefetch_related(
             'networks', 'source', 'portal', 'web_links', 'accessibilities', 'themes', 'aggregations',
@@ -420,7 +420,7 @@ class POIViewSet(MapEntityViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def get_queryset(self):
-        return POI.objects.existing().filter(published=True).transform(settings.API_SRID, field_name='geom')
+        return POI.objects.filter(published=True).transform(settings.API_SRID, field_name='geom')
 
 
 class TrekPOIViewSet(viewsets.ModelViewSet):
@@ -435,7 +435,7 @@ class TrekPOIViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         pk = self.kwargs['pk']
         try:
-            trek = Trek.objects.existing().get(pk=pk)
+            trek = Trek.objects.get(pk=pk)
         except Trek.DoesNotExist:
             raise Http404
         if not self.request.user.has_perm('trekking.read_poi') and not trek.is_public():
@@ -455,7 +455,7 @@ class TrekSignageViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         pk = self.kwargs['pk']
         try:
-            trek = Trek.objects.existing().get(pk=pk)
+            trek = Trek.objects.get(pk=pk)
         except Trek.DoesNotExist:
             raise Http404
         if not self.request.user.has_perm('trekking.read_signage') and not trek.is_public():
@@ -475,7 +475,7 @@ class TrekInfrastructureViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         pk = self.kwargs['pk']
         try:
-            trek = Trek.objects.existing().get(pk=pk)
+            trek = Trek.objects.get(pk=pk)
         except Trek.DoesNotExist:
             raise Http404
         if not self.request.user.has_perm('trekking.read_infrastructure') and not trek.is_public():
@@ -485,13 +485,13 @@ class TrekInfrastructureViewSet(viewsets.ModelViewSet):
 
 class ServiceLayer(MapEntityLayer):
     properties = ['label', 'published']
-    queryset = Service.objects.existing()
+    model = Service
 
 
 class ServiceList(MapEntityList):
     filterform = ServiceFilterSet
     columns = ['id', 'name']
-    queryset = Service.objects.existing()
+    model = Service
 
 
 class ServiceJsonList(MapEntityJsonList, ServiceList):
@@ -505,7 +505,7 @@ class ServiceFormatList(MapEntityFormat, ServiceList):
 
 
 class ServiceDetail(MapEntityDetail):
-    queryset = Service.objects.existing()
+    model = Service
 
     def get_context_data(self, *args, **kwargs):
         context = super(ServiceDetail, self).get_context_data(*args, **kwargs)
@@ -519,7 +519,7 @@ class ServiceCreate(MapEntityCreate):
 
 
 class ServiceUpdate(MapEntityUpdate):
-    queryset = Service.objects.existing()
+    model = Service
     form_class = ServiceForm
 
     @same_structure_required('trekking:service_detail')
@@ -541,7 +541,7 @@ class ServiceViewSet(MapEntityViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def get_queryset(self):
-        return Service.objects.existing().filter(type__published=True).transform(settings.API_SRID, field_name='geom')
+        return Service.objects.filter(type__published=True).transform(settings.API_SRID, field_name='geom')
 
 
 class TrekServiceViewSet(viewsets.ModelViewSet):
@@ -556,7 +556,7 @@ class TrekServiceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         pk = self.kwargs['pk']
         try:
-            trek = Trek.objects.existing().get(pk=pk)
+            trek = Trek.objects.get(pk=pk)
         except Trek.DoesNotExist:
             raise Http404
         if not self.request.user.has_perm('trekking.read_service') and not trek.is_public():
@@ -568,7 +568,7 @@ class CirkwiTrekView(ListView):
     model = Trek
 
     def get_queryset(self):
-        qs = Trek.objects.existing()
+        qs = Trek.objects.all()
         qs = qs.filter(published=True)
         return qs
 
@@ -584,7 +584,7 @@ class CirkwiPOIView(ListView):
     model = POI
 
     def get_queryset(self):
-        qs = POI.objects.existing()
+        qs = POI.objects.all()
         qs = qs.filter(published=True)
         return qs
 
@@ -665,20 +665,19 @@ class Meta(TemplateView):
         context['facebook_image'] = urljoin(self.request.GET['rando_url'], settings.FACEBOOK_IMAGE)
         context['FACEBOOK_IMAGE_WIDTH'] = settings.FACEBOOK_IMAGE_WIDTH
         context['FACEBOOK_IMAGE_HEIGHT'] = settings.FACEBOOK_IMAGE_HEIGHT
-        context['treks'] = Trek.objects.existing().order_by('pk').filter(
+        context['treks'] = Trek.objects.order_by('pk').filter(
             Q(**{'published_{lang}'.format(lang=lang): True})
-            | Q(**{'trek_parents__parent__published_{lang}'.format(lang=lang): True,
-                   'trek_parents__parent__deleted': False})
+            | Q(**{'trek_parents__parent__published_{lang}'.format(lang=lang): True})
         )
         if 'geotrek.tourism' in settings.INSTALLED_APPS:
-            context['contents'] = TouristicContent.objects.existing().order_by('pk').filter(
+            context['contents'] = TouristicContent.objects.order_by('pk').filter(
                 **{'published_{lang}'.format(lang=lang): True}
             )
-            context['events'] = TouristicEvent.objects.existing().order_by('pk').filter(
+            context['events'] = TouristicEvent.objects.order_by('pk').filter(
                 **{'published_{lang}'.format(lang=lang): True}
             )
         if 'geotrek.diving' in settings.INSTALLED_APPS:
-            context['dives'] = Dive.objects.existing().order_by('pk').filter(
+            context['dives'] = Dive.objects.order_by('pk').filter(
                 **{'published_{lang}'.format(lang=lang): True}
             )
         return context

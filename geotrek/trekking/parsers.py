@@ -33,7 +33,6 @@ class TrekParser(DurationParserMixin, AttachmentParserMixin, ShapeParser):
     constant_fields = {
         'published': True,
         'is_park_centered': False,
-        'deleted': False,
     }
     natural_keys = {
         'difficulty': 'difficulty',

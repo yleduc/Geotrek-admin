@@ -10,7 +10,7 @@ from django.contrib.gis.geos import Point, LineString
 from geotrek.common.utils import dbnow
 from geotrek.core.factories import (PathFactory, PathAggregationFactory,
                                     TopologyFactory)
-from geotrek.core.models import Path, Topology, PathAggregation
+from geotrek.core.models import Path, Topology
 from geotrek.core.helpers import TopologyHelper
 
 
@@ -38,18 +38,6 @@ class TopologyTest(TestCase):
         e.save()
         t2 = dbnow()
         self.assertTrue(t1 < e.date_insert < t2)
-
-        e.delete()
-        t3 = dbnow()
-        self.assertTrue(t2 < e.date_update < t3)
-
-    def test_latestupdate_delete(self):
-        for i in range(10):
-            TopologyFactory.create()
-        t1 = dbnow()
-        self.assertTrue(t1 > Topology.objects.latest("date_update").date_update)
-        (Topology.objects.all()[0]).delete(force=True)
-        self.assertFalse(t1 > Topology.objects.latest("date_update").date_update)
 
     def test_length(self):
         e = TopologyFactory.build(no_path=True)
@@ -158,33 +146,15 @@ class TopologyTest(TestCase):
 @skipIf(not settings.TREKKING_TOPOLOGY_ENABLED, 'Test with dynamic segmentation only')
 class TopologyDeletionTest(TestCase):
 
-    def test_deleted_is_hidden_but_still_exists(self):
-        topology = TopologyFactory.create(offset=1)
-        path = topology.paths.get()
-        self.assertEqual(len(PathAggregation.objects.filter(topo_object=topology)), 1)
-        self.assertEqual(len(path.topology_set.all()), 1)
-        topology.delete()
-        # Make sure object remains in database with deleted status
-        self.assertEqual(len(PathAggregation.objects.filter(topo_object=topology)), 1)
-        # Make sure object has deleted status
-        self.assertTrue(topology.deleted)
-        # Make sure object still exists
-        self.assertEqual(len(path.topology_set.all()), 1)
-        self.assertIn(topology, Topology.objects.all())
-        # Make sure object can be hidden from managers
-        self.assertNotIn(topology, Topology.objects.existing())
-        self.assertEqual(len(path.topology_set.existing()), 0)
-
-    def test_deleted_when_all_path_are_deleted(self):
+    def test_null_geom_when_all_path_are_deleted(self):
         topology = TopologyFactory.create()
-        self.assertFalse(topology.deleted)
 
         paths = path = topology.paths.all()
         for path in paths:
             path.delete()
 
         topology.reload()
-        self.assertTrue(topology.deleted)
+        self.assertIsNone(Topology.objects.get().geom)
 
 
 @skipIf(not settings.TREKKING_TOPOLOGY_ENABLED, 'Test with dynamic segmentation only')

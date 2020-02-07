@@ -28,12 +28,12 @@ logger = logging.getLogger(__name__)
 
 
 class SensitiveAreaLayer(MapEntityLayer):
-    queryset = SensitiveArea.objects.existing()
+    model = SensitiveArea
     properties = ['species', 'radius', 'published']
 
 
 class SensitiveAreaList(MapEntityList):
-    queryset = SensitiveArea.objects.existing()
+    model = SensitiveArea
     filterform = SensitiveAreaFilterSet
     columns = ['id', 'species', 'category']
 
@@ -45,7 +45,7 @@ class SensitiveAreaFormatList(MapEntityFormat, SensitiveAreaList):
 
 
 class SensitiveAreaDetail(MapEntityDetail):
-    queryset = SensitiveArea.objects.existing()
+    model = SensitiveArea
 
     def get_context_data(self, *args, **kwargs):
         context = super(SensitiveAreaDetail, self).get_context_data(*args, **kwargs)
@@ -73,7 +73,7 @@ class SensitiveAreaCreate(SensitiveAreaRadiiMixin, MapEntityCreate):
 
 
 class SensitiveAreaUpdate(SensitiveAreaRadiiMixin, MapEntityUpdate):
-    queryset = SensitiveArea.objects.existing()
+    model = SensitiveArea
 
     def get_form_class(self):
         if self.object.species.category == Species.REGULATORY:
@@ -99,7 +99,7 @@ class SensitiveAreaViewSet(MapEntityViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def get_queryset(self):
-        qs = SensitiveArea.objects.existing()
+        qs = SensitiveArea.objects.all()
         qs = qs.filter(published=True)
         qs = qs.prefetch_related('species')
         qs = qs.annotate(geom_type=GeometryType(F('geom')))
@@ -130,7 +130,7 @@ if 'geotrek.trekking' in settings.INSTALLED_APPS:
         def get_queryset(self):
             pk = self.kwargs['pk']
             try:
-                trek = Trek.objects.existing().get(pk=pk)
+                trek = Trek.objects.get(pk=pk)
             except Trek.DoesNotExist:
                 raise Http404
             if not trek.is_public():
@@ -164,7 +164,7 @@ if 'geotrek.diving' in settings.INSTALLED_APPS:
         def get_queryset(self):
             pk = self.kwargs['pk']
             try:
-                dive = Dive.objects.existing().get(pk=pk)
+                dive = Dive.objects.get(pk=pk)
             except Dive.DoesNotExist:
                 raise Http404
             if not dive.is_public:
@@ -187,7 +187,7 @@ if 'geotrek.diving' in settings.INSTALLED_APPS:
 
 
 class SensitiveAreaKMLDetail(LastModifiedMixin, PublicOrReadPermMixin, BaseDetailView):
-    queryset = SensitiveArea.objects.existing()
+    model = SensitiveArea
 
     def render_to_response(self, context):
         area = self.get_object()

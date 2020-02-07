@@ -22,12 +22,12 @@ logger = logging.getLogger(__name__)
 
 
 class InterventionLayer(MapEntityLayer):
-    queryset = Intervention.objects.existing()
+    model = Intervention
     properties = ['name']
 
 
 class InterventionList(MapEntityList):
-    queryset = Intervention.objects.existing()
+    model = Intervention
     filterform = InterventionFilterSet
     columns = ['id', 'name', 'date', 'type', 'infrastructure', 'status', 'stake']
 
@@ -49,7 +49,7 @@ class InterventionFormatList(MapEntityFormat, InterventionList):
 
 
 class InterventionDetail(MapEntityDetail):
-    queryset = Intervention.objects.existing()
+    model = Intervention
 
     def get_context_data(self, *args, **kwargs):
         context = super(InterventionDetail, self).get_context_data(*args, **kwargs)
@@ -74,7 +74,7 @@ class InterventionCreate(ManDayFormsetMixin, CreateFromTopologyMixin, MapEntityC
         pk_infra = self.request.GET.get('infrastructure')
         if pk_infra:
             try:
-                return Infrastructure.objects.existing().get(pk=pk_infra)
+                return Infrastructure.objects.get(pk=pk_infra)
             except Infrastructure.DoesNotExist:
                 logger.warning("Intervention on unknown infrastructure %s" % pk_infra)
 
@@ -82,7 +82,7 @@ class InterventionCreate(ManDayFormsetMixin, CreateFromTopologyMixin, MapEntityC
         pk_signa = self.request.GET.get('signage')
         if pk_signa:
             try:
-                return Signage.objects.existing().get(pk=pk_signa)
+                return Signage.objects.get(pk=pk_signa)
             except Signage.DoesNotExist:
                 logger.warning("Intervention on unknown signage %s" % pk_signa)
         return None
@@ -104,7 +104,7 @@ class InterventionCreate(ManDayFormsetMixin, CreateFromTopologyMixin, MapEntityC
 
 
 class InterventionUpdate(ManDayFormsetMixin, MapEntityUpdate):
-    queryset = Intervention.objects.existing()
+    model = Intervention
     form_class = InterventionForm
 
     @same_structure_required('maintenance:intervention_detail')
@@ -122,22 +122,22 @@ class InterventionDelete(MapEntityDelete):
 
 class InterventionViewSet(MapEntityViewSet):
     model = Intervention
-    queryset = Intervention.objects.existing()
+    model = Intervention
     serializer_class = InterventionSerializer
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
 
 class ProjectLayer(MapEntityLayer):
-    queryset = Project.objects.existing()
+    model = Project
     properties = ['name']
 
     def get_queryset(self):
-        nonemptyqs = Intervention.objects.existing().filter(project__isnull=False).values('project')
+        nonemptyqs = Intervention.objects.filter(project__isnull=False).values('project')
         return super(ProjectLayer, self).get_queryset().filter(pk__in=nonemptyqs)
 
 
 class ProjectList(MapEntityList):
-    queryset = Project.objects.existing()
+    model = Project
     filterform = ProjectFilterSet
     columns = ['id', 'name', 'period', 'type', 'domain']
 
@@ -157,7 +157,7 @@ class ProjectFormatList(MapEntityFormat, ProjectList):
 
 
 class ProjectDetail(MapEntityDetail):
-    queryset = Project.objects.existing()
+    model = Project
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProjectDetail, self).get_context_data(*args, **kwargs)
@@ -181,7 +181,7 @@ class ProjectCreate(FundingFormsetMixin, MapEntityCreate):
 
 
 class ProjectUpdate(FundingFormsetMixin, MapEntityUpdate):
-    queryset = Project.objects.existing()
+    model = Project
     form_class = ProjectForm
 
     @same_structure_required('maintenance:project_detail')
@@ -199,6 +199,6 @@ class ProjectDelete(MapEntityDelete):
 
 class ProjectViewSet(MapEntityViewSet):
     model = Project
-    queryset = Project.objects.existing()
+    model = Project
     serializer_class = ProjectSerializer
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]

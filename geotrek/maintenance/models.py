@@ -13,7 +13,7 @@ from geotrek.authent.models import StructureRelated, StructureOrNoneRelated
 from geotrek.altimetry.models import AltimetryMixin
 from geotrek.core.models import Topology, Path, Trail
 from geotrek.common.models import Organism
-from geotrek.common.mixins import TimeStampedModelMixin, NoDeleteMixin, AddPropertyMixin
+from geotrek.common.mixins import TimeStampedModelMixin, AddPropertyMixin
 from geotrek.common.utils import classproperty
 from geotrek.infrastructure.models import Infrastructure
 from geotrek.signage.models import Signage
@@ -21,12 +21,12 @@ from geotrek.signage.models import Signage
 
 class InterventionManager(models.GeoManager):
     def all_years(self):
-        return self.existing().filter(date__isnull=False).annotate(year=ExtractYear('date')) \
+        return self.filter(date__isnull=False).annotate(year=ExtractYear('date')) \
             .order_by('-year').values_list('year', flat=True).distinct()
 
 
 class Intervention(AddPropertyMixin, MapEntityMixin, AltimetryMixin,
-                   TimeStampedModelMixin, StructureRelated, NoDeleteMixin):
+                   TimeStampedModelMixin, StructureRelated):
 
     name = models.CharField(verbose_name=_("Name"), max_length=128, db_column='nom',
                             help_text=_("Brief summary"))
@@ -72,7 +72,7 @@ class Intervention(AddPropertyMixin, MapEntityMixin, AltimetryMixin,
     description = models.TextField(blank=True, verbose_name=_("Description"), db_column='descriptif',
                                    help_text=_("Remarks and notes"))
 
-    objects = NoDeleteMixin.get_manager_cls(InterventionManager)()
+    objects = InterventionManager()
 
     class Meta:
         db_table = 'm_t_intervention'
@@ -102,7 +102,6 @@ class Intervention(AddPropertyMixin, MapEntityMixin, AltimetryMixin,
             self.area = fromdb.area
             AltimetryMixin.reload(self, fromdb)
             TimeStampedModelMixin.reload(self, fromdb)
-            NoDeleteMixin.reload(self, fromdb)
             if self.topology:
                 self.topology.reload()
         return self
@@ -222,13 +221,13 @@ class Intervention(AddPropertyMixin, MapEntityMixin, AltimetryMixin,
     @property
     def signages(self):
         if self.is_signage:
-            return [Signage.objects.existing().get(pk=self.topology.pk)]
+            return [Signage.objects.get(pk=self.topology.pk)]
         return []
 
     @property
     def infrastructures(self):
         if self.is_infrastructure:
-            return [Infrastructure.objects.existing().get(pk=self.topology.pk)]
+            return [Infrastructure.objects.get(pk=self.topology.pk)]
         return []
 
     @property
@@ -295,12 +294,12 @@ class Intervention(AddPropertyMixin, MapEntityMixin, AltimetryMixin,
 
     @classmethod
     def path_interventions(cls, path):
-        return cls.objects.existing().filter(topology__aggregations__path=path)
+        return cls.objects.filter(topology__aggregations__path=path)
 
     @classmethod
     def topology_interventions(cls, topology):
         topos = Topology.overlapping(topology).values_list('pk', flat=True)
-        return cls.objects.existing().filter(topology__in=topos).distinct('pk')
+        return cls.objects.filter(topology__in=topos).distinct('pk')
 
 
 Path.add_property('interventions', lambda self: Intervention.path_interventions(self), _("Interventions"))
@@ -396,14 +395,14 @@ class ManDay(models.Model):
 
 class ProjectManager(models.GeoManager):
     def all_years(self):
-        all_years = list(self.existing().exclude(begin_year=None).values_list('begin_year', flat=True))
-        all_years += list(self.existing().exclude(end_year=None).values_list('end_year', flat=True))
+        all_years = list(self.exclude(begin_year=None).values_list('begin_year', flat=True))
+        all_years += list(self.exclude(end_year=None).values_list('end_year', flat=True))
         all_years.sort(reverse=True)
         return all_years
 
 
 class Project(AddPropertyMixin, MapEntityMixin, TimeStampedModelMixin,
-              StructureRelated, NoDeleteMixin):
+              StructureRelated):
 
     name = models.CharField(verbose_name=_("Name"), max_length=128, db_column='nom')
     begin_year = models.IntegerField(verbose_name=_("Begin year"), db_column='annee_debut')
@@ -426,7 +425,7 @@ class Project(AddPropertyMixin, MapEntityMixin, TimeStampedModelMixin,
                                         verbose_name=_("Project manager"), db_column='maitre_ouvrage')
     founders = models.ManyToManyField(Organism, through='Funding', verbose_name=_("Founders"))
 
-    objects = NoDeleteMixin.get_manager_cls(ProjectManager)()
+    objects = ProjectManager()
 
     class Meta:
         db_table = 'm_t_chantier'
@@ -441,14 +440,14 @@ class Project(AddPropertyMixin, MapEntityMixin, TimeStampedModelMixin,
     @property
     def paths(self):
         s = []
-        for i in self.interventions.existing():
+        for i in self.interventions.all():
             s += i.paths
         return Path.objects.filter(pk__in=[p.pk for p in set(s)])
 
     @property
     def trails(self):
         s = []
-        for i in self.interventions.existing():
+        for i in self.interventions.all():
             for p in i.paths.all():
                 for t in p.trails.all():
                     s.append(t.pk)
@@ -458,14 +457,14 @@ class Project(AddPropertyMixin, MapEntityMixin, TimeStampedModelMixin,
     @property
     def signages(self):
         s = []
-        for i in self.interventions.existing():
+        for i in self.interventions.all():
             s += i.signages
         return list(set(s))
 
     @property
     def infrastructures(self):
         s = []
-        for i in self.interventions.existing():
+        for i in self.interventions.all():
             s += i.infrastructures
         return list(set(s))
 
@@ -482,7 +481,7 @@ class Project(AddPropertyMixin, MapEntityMixin, TimeStampedModelMixin,
         """ Merge all interventions geometry into a collection
         """
         if self._geom is None:
-            interventions = Intervention.objects.existing().filter(project=self)
+            interventions = Intervention.objects.filter(project=self)
             geoms = [i.geom for i in interventions if i.geom is not None]
             if geoms:
                 self._geom = GeometryCollection(*geoms, srid=settings.SRID)
@@ -505,7 +504,7 @@ class Project(AddPropertyMixin, MapEntityMixin, TimeStampedModelMixin,
 
     @property
     def interventions_csv_display(self):
-        return [str(i) for i in self.interventions.existing()]
+        return [str(i) for i in self.interventions.all()]
 
     @property
     def contractors_display(self):
@@ -530,7 +529,7 @@ class Project(AddPropertyMixin, MapEntityMixin, TimeStampedModelMixin,
     @property
     def interventions_total_cost(self):
         total = 0
-        qs = self.interventions.existing()
+        qs = self.interventions.all()
         for i in qs.prefetch_related('manday_set', 'manday_set__job'):
             total += i.total_cost
         return total
@@ -544,11 +543,11 @@ class Project(AddPropertyMixin, MapEntityMixin, TimeStampedModelMixin,
 
     @classmethod
     def path_projects(cls, path):
-        return cls.objects.existing().filter(interventions__in=path.interventions).distinct()
+        return cls.objects.filter(interventions__in=path.interventions).distinct()
 
     @classmethod
     def topology_projects(cls, topology):
-        return cls.objects.existing().filter(interventions__in=topology.interventions).distinct()
+        return cls.objects.filter(interventions__in=topology.interventions).distinct()
 
     def edges_by_attr(self, interventionattr):
         """ Return related topology objects of project, by aggregating the same attribute

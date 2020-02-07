@@ -26,12 +26,12 @@ class LineMixin(FormsetMixin):
 
 
 class SignageLayer(MapEntityLayer):
-    queryset = Signage.objects.existing()
+    model = Signage
     properties = ['name', 'published']
 
 
 class SignageList(MapEntityList):
-    queryset = Signage.objects.existing()
+    model = Signage
     filterform = SignageFilterSet
     columns = ['id', 'name', 'code', 'type', 'condition']
 
@@ -50,7 +50,7 @@ class SignageFormatList(MapEntityFormat, SignageList):
 
 
 class SignageDetail(MapEntityDetail):
-    queryset = Signage.objects.existing()
+    model = Signage
 
     def get_context_data(self, *args, **kwargs):
         context = super(SignageDetail, self).get_context_data(*args, **kwargs)
@@ -68,7 +68,7 @@ class SignageCreate(MapEntityCreate):
 
 
 class SignageUpdate(MapEntityUpdate):
-    queryset = Signage.objects.existing()
+    model = Signage
     form_class = SignageForm
 
     @same_structure_required('signage:signage_detail')
@@ -90,11 +90,11 @@ class SignageViewSet(MapEntityViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def get_queryset(self):
-        return Signage.objects.existing().filter(published=True).transform(settings.API_SRID, field_name='geom')
+        return Signage.objects.filter(published=True).transform(settings.API_SRID, field_name='geom')
 
 
 class BladeDetail(MapEntityDetail):
-    queryset = Blade.objects.existing()
+    model = Blade
 
     def get_context_data(self, *args, **kwargs):
         context = super(BladeDetail, self).get_context_data(*args, **kwargs)
@@ -114,7 +114,7 @@ class BladeCreate(LineMixin, MapEntityCreate):
         pk_infra = self.request.GET.get('signage')
         if pk_infra:
             try:
-                return Signage.objects.existing().get(pk=pk_infra)
+                return Signage.objects.get(pk=pk_infra)
             except Signage.DoesNotExist:
                 logger.warning("Intervention on unknown infrastructure %s" % pk_infra)
         return None
@@ -130,7 +130,7 @@ class BladeCreate(LineMixin, MapEntityCreate):
 
 
 class BladeUpdate(LineMixin, MapEntityUpdate):
-    queryset = Blade.objects.existing()
+    model = Blade
     form_class = BladeForm
 
     @same_structure_required('signage:blade_detail')
@@ -145,12 +145,12 @@ class BladeDelete(MapEntityDelete):
 class BladeViewSet(MapEntityViewSet):
     model = Blade
     serializer_class = BladeSerializer
-    queryset = Blade.objects.existing()
+    model = Blade
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
 
 class BladeList(MapEntityList):
-    queryset = Blade.objects.existing()
+    model = Blade
     filterform = BladeFilterSet
     columns = ['id', 'number', 'direction', 'type', 'color']
 
@@ -160,7 +160,7 @@ class BladeJsonList(MapEntityJsonList, BladeList):
 
 
 class BladeLayer(MapEntityLayer):
-    queryset = Blade.objects.existing()
+    model = Blade
     properties = ['number']
 
 

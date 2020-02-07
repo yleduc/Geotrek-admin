@@ -17,7 +17,7 @@ from geotrek.common.tests import CommonTest
 from geotrek.authent.factories import PathManagerFactory, StructureFactory
 from geotrek.authent.tests import AuthentFixturesTest
 
-from geotrek.core.models import Path, Trail, PathSource
+from geotrek.core.models import Path, Trail, PathSource, Topology
 
 from geotrek.trekking.factories import POIFactory, TrekFactory, ServiceFactory
 from geotrek.infrastructure.factories import InfrastructureFactory
@@ -677,7 +677,7 @@ class RemovePathKeepTopology(TestCase):
                               |
                               C
 
-        poi is linked with DC and e1 is deleted
+        poi is linked with DC and e1 geom is set to None
         """
         ab = PathFactory.create(name="AB", geom=LineString((0, 0), (1, 0)))
         PathFactory.create(name="CD", geom=LineString((2, 0), (2, 1)))
@@ -696,8 +696,7 @@ class RemovePathKeepTopology(TestCase):
         e1.reload()
 
         self.assertEqual(len(Path.objects.all()), 1)
-
-        self.assertEqual(e1.deleted, True)
-        self.assertEqual(poi.deleted, False)
+        self.assertEqual(len(Topology.objects.all()), 2)
 
         self.assertAlmostEqual(1.5, poi.offset)
+        self.assertIsNone(e1.geom)

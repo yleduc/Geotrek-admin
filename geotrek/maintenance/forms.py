@@ -54,14 +54,14 @@ FundingFormSet = inlineformset_factory(Project, Project.founders.through, form=F
 
 class InterventionBaseForm(CommonForm):
     infrastructure = forms.ModelChoiceField(required=False,
-                                            queryset=Infrastructure.objects.existing(),
+                                            queryset=Infrastructure.objects.all(),
                                             widget=forms.HiddenInput())
     signage = forms.ModelChoiceField(required=False,
-                                     queryset=Signage.objects.existing(),
+                                     queryset=Signage.objects.all(),
                                      widget=forms.HiddenInput())
     length = FloatField(required=False, label=_("Length"))
     project = forms.ModelChoiceField(required=False, label=_("Project"),
-                                     queryset=Project.objects.existing())
+                                     queryset=Project.objects.all())
     geomfields = ['topology']
     leftpanel_scrollable = False
 

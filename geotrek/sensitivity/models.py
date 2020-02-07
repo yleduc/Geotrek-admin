@@ -12,7 +12,7 @@ from django.utils.translation import pgettext_lazy, ugettext_lazy as _
 from mapentity.models import MapEntityMixin
 from mapentity.serializers import plain_text
 from geotrek.authent.models import StructureRelated
-from geotrek.common.mixins import (OptionalPictogramMixin, NoDeleteMixin, TimeStampedModelMixin, AddPropertyMixin)
+from geotrek.common.mixins import (OptionalPictogramMixin, TimeStampedModelMixin, AddPropertyMixin)
 from geotrek.common.utils import intersecting, classproperty
 from geotrek.core.models import simplify_coords
 
@@ -76,8 +76,7 @@ class Species(OptionalPictogramMixin):
         return ", ".join([str(practice) for practice in self.practices.all()])
 
 
-class SensitiveArea(MapEntityMixin, StructureRelated, TimeStampedModelMixin, NoDeleteMixin,
-                    AddPropertyMixin):
+class SensitiveArea(MapEntityMixin, StructureRelated, TimeStampedModelMixin, AddPropertyMixin):
     geom = models.GeometryField(srid=settings.SRID)
     species = models.ForeignKey(Species, verbose_name=_("Sensitive area"), db_column='espece',
                                 on_delete=models.PROTECT)
@@ -91,7 +90,7 @@ class SensitiveArea(MapEntityMixin, StructureRelated, TimeStampedModelMixin, NoD
     eid = models.CharField(verbose_name=_("External id"), max_length=1024, blank=True, null=True,
                            db_column='id_externe')
 
-    objects = NoDeleteMixin.get_manager_cls(models.GeoManager)()
+    objects = models.GeoManager()
 
     class Meta:
         db_table = 's_t_zone_sensible'

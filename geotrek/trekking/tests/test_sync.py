@@ -29,6 +29,8 @@ from geotrek.tourism.factories import InformationDeskFactory, TouristicContentFa
 class SyncRandoTilesTest(TestCase):
     @classmethod
     def setUpClass(cls):
+        if os.path.exists(os.path.join('tmp')):
+            shutil.rmtree(os.path.join('tmp'))
         super(SyncRandoTilesTest, cls).setUpClass()
 
     @mock.patch('landez.TilesManager.tile', return_value=b'I am a png')
@@ -106,6 +108,10 @@ class SyncRandoTilesTest(TestCase):
 class SyncRandoFailTest(TestCase):
     @classmethod
     def setUpClass(cls):
+        if os.path.exists(os.path.join('tmp_sync_rando')):
+            shutil.rmtree(os.path.join('tmp_sync_rando'))
+        if os.path.exists(os.path.join('tmp')):
+            shutil.rmtree(os.path.join('tmp'))
         super(SyncRandoFailTest, cls).setUpClass()
 
     def test_fail_directory_not_empty(self):

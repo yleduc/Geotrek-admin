@@ -17,12 +17,12 @@ from mapentity.views import MapEntityViewSet
 
 
 class InfrastructureLayer(MapEntityLayer):
-    queryset = Infrastructure.objects.existing()
+    model = Infrastructure
     properties = ['name', 'published']
 
 
 class InfrastructureList(MapEntityList):
-    queryset = Infrastructure.objects.existing()
+    model = Infrastructure
     filterform = InfrastructureFilterSet
     columns = ['id', 'name', 'type', 'condition', 'cities']
 
@@ -40,7 +40,7 @@ class InfrastructureFormatList(MapEntityFormat, InfrastructureList):
 
 
 class InfrastructureDetail(MapEntityDetail):
-    queryset = Infrastructure.objects.existing()
+    model = Infrastructure
 
     def get_context_data(self, *args, **kwargs):
         context = super(InfrastructureDetail, self).get_context_data(*args, **kwargs)
@@ -58,7 +58,7 @@ class InfrastructureCreate(CreateFromTopologyMixin, MapEntityCreate):
 
 
 class InfrastructureUpdate(MapEntityUpdate):
-    queryset = Infrastructure.objects.existing()
+    model = Infrastructure
     form_class = InfrastructureForm
 
     @same_structure_required('infrastructure:infrastructure_detail')
@@ -80,4 +80,4 @@ class InfrastructureViewSet(MapEntityViewSet):
     permission_classes = [rest_permissions.DjangoModelPermissionsOrAnonReadOnly]
 
     def get_queryset(self):
-        return Infrastructure.objects.existing().filter(published=True).transform(settings.API_SRID, field_name='geom')
+        return Infrastructure.objects.filter(published=True).transform(settings.API_SRID, field_name='geom')

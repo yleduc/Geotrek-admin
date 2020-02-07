@@ -177,7 +177,6 @@ class InterventionViewsTest(CommonTest):
         self.assertEqual(response.status_code, 302)
         # Check that intervention was not deleted (bug #783)
         intervention.reload()
-        self.assertFalse(intervention.deleted)
         self.assertEqual(intervention.signage.name, 'modified')
         self.assertEqual(intervention.signage.implantation_year, target_year)
 
@@ -282,7 +281,6 @@ class InterventionViewsTest(CommonTest):
         self.assertEqual(response.status_code, 302)
         # Check that intervention was not deleted (bug #783)
         intervention.reload()
-        self.assertFalse(intervention.deleted)
         self.assertEqual(intervention.infrastructure.name, 'modified')
         self.assertEqual(intervention.infrastructure.implantation_year, target_year)
 

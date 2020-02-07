@@ -182,7 +182,7 @@ DECLARE
 BEGIN
     -- Mark empty topologies as deleted
     UPDATE e_t_evenement e
-        SET supprime = TRUE
+        SET geom = NULL
         FROM e_r_evenement_troncon et
         WHERE et.evenement = e.id AND et.troncon = OLD.id AND NOT EXISTS(
             SELECT * FROM e_r_evenement_troncon
