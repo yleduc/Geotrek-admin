@@ -5,6 +5,10 @@ CHANGELOG
 2.32.12.dev0
 --------------------
 
+**Minor changes**
+
+- Add cleanup_attachments command to remove stale attachment files
+
 **Bug fixes**
 
 -
