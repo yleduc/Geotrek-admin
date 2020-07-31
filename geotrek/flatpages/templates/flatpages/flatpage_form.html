@@ -91,6 +91,9 @@
                     config: {
                         inline: true,
                         selector: "textarea",
+                        convert_urls: {{ config_tinymce.convert_urls|lower }},
+                        remove_script_host: {{ config_tinymce.remove_script_host|lower }},
+                        relative_urls: {{ config_tinymce.relative_urls|lower }},
                         external_plugins: {
                             'youtube': '/static/tiny_mce/plugins/youtube/plugin.min.js'
                         },

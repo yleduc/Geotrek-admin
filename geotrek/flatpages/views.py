@@ -44,6 +44,12 @@ class FlatPageEditMixin(object):
         kwargs['user'] = self.request.user
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['config_tinymce'] = settings.TINYMCE_DEFAULT_CONFIG
+        return context
+
 
 class FlatPageCreate(FlatPageEditMixin, CreateView):
     pass
