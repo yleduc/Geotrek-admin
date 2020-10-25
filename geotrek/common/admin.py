@@ -98,7 +98,7 @@ class RecordSourceAdmin(admin.ModelAdmin):
     search_fields = ('name', )
 
 
-class TargetPortalAdmin(admin.ModelAdmin):
+class TargetPortalAdmin(TranslationAdmin):
     list_display = ('name', 'website', 'title')
     search_fields = ('name', 'website')
 
