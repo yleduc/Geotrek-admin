@@ -32,9 +32,5 @@ ALLOWED_HOSTS = ['*']
 MIDDLEWARE += (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
-#
-# Use some default tiles
-# ..........................
 
-LOGGING['loggers']['geotrek']['level'] = 'DEBUG'
-LOGGING['loggers']['']['level'] = 'DEBUG'
+LOGGING['handlers']['console']['level'] = 'INFO'
