@@ -27,7 +27,7 @@ from django.utils.encoding import force_str
 from django.conf import settings
 from paperclip.models import attachment_upload
 
-from geotrek.authent.models import default_structure
+from geotrek.authent.models import Structure
 from geotrek.common.models import FileType, Attachment
 
 if 'modeltranslation' in settings.INSTALLED_APPS:
@@ -87,7 +87,7 @@ class Parser(object):
         self.nb_unmodified = 0
         self.progress_cb = progress_cb
         self.user = user
-        self.structure = user and user.profile.structure or default_structure()
+        self.structure = user and user.profile.structure or Structure.objects.first()
         self.encoding = encoding
 
         try:
