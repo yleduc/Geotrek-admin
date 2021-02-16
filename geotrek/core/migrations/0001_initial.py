@@ -4,7 +4,6 @@ import mapentity.models
 import django.contrib.gis.db.models.fields
 import django.db.models.deletion
 import geotrek.common.mixins
-import geotrek.authent.models
 
 
 class Migration(migrations.Migration):

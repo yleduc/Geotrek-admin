@@ -4,7 +4,6 @@ import mapentity.models
 import django.contrib.gis.db.models.fields
 import geotrek.common.mixins
 import django.core.validators
-import geotrek.authent.models
 
 
 class Migration(migrations.Migration):

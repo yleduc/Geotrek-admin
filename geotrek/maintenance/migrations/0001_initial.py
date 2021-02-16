@@ -4,7 +4,6 @@ import datetime
 import mapentity.models
 import django.contrib.gis.db.models.fields
 import geotrek.common.mixins
-import geotrek.authent.models
 
 
 class Migration(migrations.Migration):
