@@ -87,7 +87,7 @@ class Parser(object):
         self.nb_unmodified = 0
         self.progress_cb = progress_cb
         self.user = user
-        self.structure = user and user.profile.structure or Structure.objects.first()
+        self.structure = user and user.profile.structure or Structure.objects.get(pk=settings.DEFAULT_STRUCTURE_PK)
         self.encoding = encoding
 
         try:

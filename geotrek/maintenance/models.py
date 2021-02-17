@@ -322,7 +322,7 @@ class InterventionDisorder(StructureOrNoneRelated):
 class InterventionJob(StructureOrNoneRelated):
 
     job = models.CharField(max_length=128, verbose_name=_("Job"))
-    cost = models.DecimalField(verbose_name=_("Cost"), default=1.0, decimal_places=2, max_digits=8)
+    cost = models.DecimalField(verbose_name=_("Cost"), default=settings.DEFAULT_STRUCTURE_PK.0, decimal_places=2, max_digits=8)
 
     class Meta:
         verbose_name = _("Intervention's job")
