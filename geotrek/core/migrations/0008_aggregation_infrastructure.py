@@ -7,16 +7,10 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('infrastructure', '0007_create_infra_signa'),
         ('core', '0007_auto_20181220_1530'),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='PathAggregation',
-            name='topo_object',
-            field=models.ForeignKey(db_column='evenement', on_delete=django.db.models.deletion.CASCADE, related_name='aggregations', to='core.Topology', verbose_name='Topology'),
-        ),
         migrations.AlterField(
             model_name='PathAggregation',
             name='topo_object',
