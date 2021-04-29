@@ -325,22 +325,27 @@ BEGIN
                             AND ((least(start_position, end_position) < b AND greatest(start_position, end_position) > a) OR       -- Overlapping
                                 (start_position = end_position AND start_position = a AND "offset" = 0)) -- Point
                         LOOP
-                            INSERT INTO core_pathaggregation (path_id, topo_object_id, start_position, end_position, "order")
-                                VALUES (
-                                    tid_clone,
-                                    aggregation.topo_object_id,
-                                    CASE WHEN aggregation.start_position <= aggregation.end_position THEN
-                                        (greatest(a, aggregation.start_position) - a) / (b - a)
-                                    ELSE
-                                        (least(b, aggregation.start_position) - a) / (b - a)
-                                    END,
-                                    CASE WHEN aggregation.start_position <= aggregation.end_position THEN
-                                        (least(b, aggregation.end_position) - a) / (b - a)
-                                    ELSE
-                                        (greatest(a, aggregation.end_position) - a) / (b - a)
-                                    END,
-                                    aggregation."order"
-                                );
+                            IF aggregation.start_position <= aggregation.end_position THEN
+                                -- aggregation and topology in same direction
+                                INSERT INTO core_pathaggregation (path_id, topo_object_id, start_position, end_position, "order")
+                                    VALUES (
+                                        tid_clone,
+                                        aggregation.topo_object_id,
+                                        (greatest(a, aggregation.start_position) - a) / (b - a),
+                                        (least(b, aggregation.end_position) - a) / (b - a),
+                                        aggregation."order"
+                                    );
+                            ELSE
+                                -- aggregation and topology in opposite direction
+                                INSERT INTO core_pathaggregation (path_id, topo_object_id, start_position, end_position, "order")
+                                    VALUES (
+                                        tid_clone,
+                                        aggregation.topo_object_id,
+                                        (least(b, aggregation.start_position) - a) / (b - a),
+                                        (greatest(a, aggregation.end_position) - a) / (b - a),
+                                        aggregation."order"
+                                    );
+                            END IF;
                             -- RAISE NOTICE 'Duplicated topology of %-% (%) on [% ; %] for %-% (%)', path.id, path.name, ST_AsText(path.geom), a, b, tid_clone, path.name, ST_AsText(segment);
                         END LOOP;
                         -- Special case : point topology at the end of path
