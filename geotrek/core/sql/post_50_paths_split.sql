@@ -89,6 +89,7 @@ FOR EACH ROW EXECUTE PROCEDURE paths_snap_extremities();
 CREATE FUNCTION {# geotrek.core #}.paths_topology_intersect_split() RETURNS trigger SECURITY DEFINER AS $$
 DECLARE
     path record;
+    aggregation record;
     tid_clone integer;
     t_count integer;
     existing_et integer[];
@@ -319,31 +320,29 @@ BEGIN
                             WHERE tr.path_id = path.id;
 
                         -- Copy topologies overlapping start/end
-                        INSERT INTO core_pathaggregation (path_id, topo_object_id, start_position, end_position, "order")
-                            SELECT
-                                tid_clone,
-                                et.topo_object_id,
-                                CASE WHEN start_position <= end_position THEN
-                                    (greatest(a, start_position) - a) / (b - a)
-                                ELSE
-                                    (least(b, start_position) - a) / (b - a)
-                                END,
-                                CASE WHEN start_position <= end_position THEN
-                                    (least(b, end_position) - a) / (b - a)
-                                ELSE
-                                    (greatest(a, end_position) - a) / (b - a)
-                                END,
-                                et."order"
-                            FROM core_pathaggregation et,
-                                 core_topology e
-                            WHERE et.topo_object_id = e.id
-                                  AND et.path_id = path.id
-                                  AND ((least(start_position, end_position) < b AND greatest(start_position, end_position) > a) OR       -- Overlapping
-                                       (start_position = end_position AND start_position = a AND "offset" = 0)); -- Point
-                        GET DIAGNOSTICS t_count = ROW_COUNT;
-                        IF t_count > 0 THEN
-                            -- RAISE NOTICE 'Duplicated % topologies of %-% (%) on [% ; %] for %-% (%)', t_count, path.id, path.name, ST_AsText(path.geom), a, b, tid_clone, path.name, ST_AsText(segment);
-                        END IF;
+                        FOR aggregation IN SELECT et.* FROM core_pathaggregation et, core_topology e
+                            WHERE et.topo_object_id = e.id AND path_id = path.id
+                            AND ((least(start_position, end_position) < b AND greatest(start_position, end_position) > a) OR       -- Overlapping
+                                (start_position = end_position AND start_position = a AND "offset" = 0)) -- Point
+                        LOOP
+                            INSERT INTO core_pathaggregation (path_id, topo_object_id, start_position, end_position, "order")
+                                VALUES (
+                                    tid_clone,
+                                    aggregation.topo_object_id,
+                                    CASE WHEN aggregation.start_position <= aggregation.end_position THEN
+                                        (greatest(a, aggregation.start_position) - a) / (b - a)
+                                    ELSE
+                                        (least(b, aggregation.start_position) - a) / (b - a)
+                                    END,
+                                    CASE WHEN aggregation.start_position <= aggregation.end_position THEN
+                                        (least(b, aggregation.end_position) - a) / (b - a)
+                                    ELSE
+                                        (greatest(a, aggregation.end_position) - a) / (b - a)
+                                    END,
+                                    aggregation."order"
+                                );
+                            -- RAISE NOTICE 'Duplicated topology of %-% (%) on [% ; %] for %-% (%)', path.id, path.name, ST_AsText(path.geom), a, b, tid_clone, path.name, ST_AsText(segment);
+                        END LOOP;
                         -- Special case : point topology at the end of path
                         IF b = 1 THEN
                             SELECT geom INTO t_geom FROM core_path WHERE id = path.id;
