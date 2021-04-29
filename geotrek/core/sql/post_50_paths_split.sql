@@ -327,16 +327,24 @@ BEGIN
                         LOOP
                             IF aggregation.start_position <= aggregation.end_position THEN
                                 -- aggregation and topology in same direction
+                                UPDATE core_pathaggregation
+                                    SET "order" = "order" + 1
+                                    WHERE topo_object_id = aggregation.topo_object_id
+                                    AND "order" > aggregation."order";
                                 INSERT INTO core_pathaggregation (path_id, topo_object_id, start_position, end_position, "order")
                                     VALUES (
                                         tid_clone,
                                         aggregation.topo_object_id,
                                         (greatest(a, aggregation.start_position) - a) / (b - a),
                                         (least(b, aggregation.end_position) - a) / (b - a),
-                                        aggregation."order"
+                                        aggregation."order" + 1
                                     );
                             ELSE
                                 -- aggregation and topology in opposite direction
+                                UPDATE core_pathaggregation
+                                    SET "order" = "order" + 1
+                                    WHERE topo_object_id = aggregation.topo_object_id
+                                    AND "order" >= aggregation."order";
                                 INSERT INTO core_pathaggregation (path_id, topo_object_id, start_position, end_position, "order")
                                     VALUES (
                                         tid_clone,
