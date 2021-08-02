@@ -689,10 +689,11 @@ class TouristicContentTourInSoftParserAPIV3(TouristicContentTourInSoftParserV3):
     def filter_attachments(self, src, val):
         if not val:
             return []
-        return [
-            (entry["Photo"]["Url"], entry["Photo"]["Titre"], entry["Photo"]["Credit"])
-            for entry in val
-        ]
+        else:
+            return [
+                (entry["Photo"]["Url"], entry["Photo"]["Titre"], entry["Photo"]["Credit"])
+                for entry in val if entry["Photo"] is not None
+            ]
 
 
 class TouristicEventTourInSoftParser(TourInSoftParser):
