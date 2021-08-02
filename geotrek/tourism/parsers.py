@@ -681,6 +681,20 @@ class TouristicContentTourInSoftParserV3(TouristicContentTourInSoftParser):
     version_tourinsoft = 3
 
 
+class TouristicContentTourInSoftParserAPIV3(TouristicContentTourInSoftParserV3):
+
+    def get_nb(self):
+        return int(len(self.root['value']))
+
+    def filter_attachments(self, src, val):
+        if not val:
+            return []
+        return [
+            (entry["Photo"]["Url"], entry["Photo"]["Titre"], entry["Photo"]["Credit"])
+            for entry in val
+        ]
+
+
 class TouristicEventTourInSoftParser(TourInSoftParser):
     eid = 'eid'
     model = TouristicEvent
