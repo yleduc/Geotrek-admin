@@ -143,11 +143,7 @@
             }
             if (hasChildElements(row)) {
                 row.addClass(options.formCssClass);
-
-                // Hack Geotrek story #514
-                // See https://code.google.com/p/django-dynamic-formset/issues/detail?id=54
-                //if (row.is(':visible')) {
-                if (true) {
+                if (row.is(':visible')) {
                     insertDeleteLink(row);
                     applyExtraClasses(row, i);
                 }
