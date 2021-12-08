@@ -32,7 +32,7 @@ setup(
     scripts=['manage.py'],
     install_requires=[
         'Django==3.1.*',
-        'mapentity==7.0.1',
+        'mapentity@git+https://github.com/makinacorpus/django-mapentity.git@configure_styles#egg=mapentity',
         'env_file',
         # pinned by requirements.txt
         'python-memcached',
@@ -63,6 +63,7 @@ setup(
         'freezegun',
         'coverage',
         'factory_boy',
+        'tblib',
         # dev,
         'django-extensions',
         'django-debug-toolbar',
