@@ -15,7 +15,7 @@ jobs:
       - run: test $(ls geotrek/*/migrations/*.py | xargs grep -l srid | xargs grep -L SRID | wc -l) -eq 0
   doc:
     docker:
-      - image: python:3.6
+      - image: python:3.8
     environment:
       LANG: C.UTF-8
     steps:
