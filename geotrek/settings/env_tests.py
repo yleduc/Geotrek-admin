@@ -45,4 +45,4 @@ ADMINS = (
 MANAGERS = ADMINS
 
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
-TEST_OUTPUT_FILE_NAME = 'test-results/junit.xml'
+TEST_OUTPUT_FILE_NAME = 'junit.xml'
