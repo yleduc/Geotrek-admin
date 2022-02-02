@@ -182,7 +182,9 @@ kombu==4.6.8
 landez==2.5.0
     # via geotrek (setup.py)
 lxml==4.7.1
-    # via mapentity
+    # via
+    #   mapentity
+    #   unittest-xml-reporting
 mapentity==7.1.2
     # via geotrek (setup.py)
 markupsafe==1.1.1
@@ -292,6 +294,8 @@ typing-extensions==4.0.1
     #   asgiref
     #   faker
     #   importlib-metadata
+unittest-xml-reporting==3.1.0
+    # via geotrek (setup.py)
 uritemplate==3.0.1
     # via
     #   coreapi

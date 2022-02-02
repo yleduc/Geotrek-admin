@@ -63,6 +63,7 @@ setup(
         'freezegun',
         'coverage',
         'factory_boy',
+        'unittest-xml-reporting',
         # dev,
         'django-extensions',
         'django-debug-toolbar',
