@@ -48,25 +48,36 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Prepare docker env
           command: |
             cp .env-prod.dist .env; cp docker-compose-prod.yml docker-compose.yml
             docker run -p 5432:5432 --env-file .env -d postgis/postgis:11-2.5
             docker pull geotrekce/circleci-admin:$CIRCLE_WORKFLOW_ID
             docker tag geotrekce/circleci-admin:$CIRCLE_WORKFLOW_ID geotrekce/admin:latest
-            docker-compose run web ./manage.py makemigrations --check
             docker-compose run web update.sh
+
+      - run:
+          name: Check migrations
+          command: |
+            docker-compose run web ./manage.py makemigrations --check
+
+      - run:
+          name: Run tests
+          command: |
             docker-compose run -e ENV=tests web coverage run ./manage.py test
             docker-compose run web coverage xml -o var/coverage.xml
+
       - store_test_results:
-          path: var/junit.xml
+          path: var/test-tesults
 
       - store_artifacts:
-          path: var/junit.xml
+          path: var/test-tesults
 
       - codecov/upload:
           file: var/coverage.xml
           flags: test
           when: on_success
+
   docker_test_18_04:
     machine: true
     environment:
@@ -74,19 +85,23 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Prepare docker env
           command: |
             cp .env-prod.dist .env; cp docker-compose-prod.yml docker-compose.yml
             docker run -p 5432:5432 --env-file .env -d postgis/postgis:11-2.5
             docker pull geotrekce/circleci-admin:18.04-$CIRCLE_WORKFLOW_ID
             docker tag geotrekce/circleci-admin:18.04-$CIRCLE_WORKFLOW_ID geotrekce/admin:latest
             docker-compose run web update.sh
+      - run:
+          name: Run tests
+          command: |
             docker-compose run -e ENV=tests web coverage run ./manage.py test -v 2
 
       - store_test_results:
-          path: var/junit.xml
+          path: var/test-tesults
 
       - store_artifacts:
-          path: var/junit.xml
+          path: var/test-tesults
 
   docker_test_nds:
     machine: true
@@ -103,10 +118,10 @@ jobs:
       - run: docker-compose run web coverage xml -o var/coverage.xml
 
       - store_test_results:
-          path: var/junit.xml
+          path: var/test-tesults
 
       - store_artifacts:
-          path: var/junit.xml
+          path: var/test-tesults
 
       - codecov/upload:
           file: var/coverage.xml
@@ -126,10 +141,10 @@ jobs:
       - run: docker-compose run -e ENV=tests_nds web coverage run ./manage.py test -v 2
 
       - store_test_results:
-          path: var/junit.xml
+          path: var/test-tesults
 
       - store_artifacts:
-          path: var/junit.xml
+          path: var/test-tesults
   docker_test_js:
     docker:
       - image: geotrekce/circleci-admin:$CIRCLE_WORKFLOW_ID
