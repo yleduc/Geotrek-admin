@@ -195,6 +195,9 @@ jobs:
       - persist_to_workspace:
           root: /root
           paths: geotrek-admin_*_amd64.deb
+      - store_artifacts:
+          path: ../geotrek-admin_*_amd64.deb
+          destination: ubuntu-package-20.04
   ubuntu_package_18_04:
     docker:
       - image: ubuntu:bionic
@@ -213,7 +216,7 @@ jobs:
           root: /root
           paths: geotrek-admin_*_amd64.deb
       - store_artifacts:
-          path: geotrek-admin_*_amd64.deb
+          path: ../geotrek-admin_*_amd64.deb
           destination: ubuntu-package-18.04
   ubuntu_publish:
     docker:
