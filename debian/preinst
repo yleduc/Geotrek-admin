@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+add-apt-repository -y ppa:deadsnakes/ppa
