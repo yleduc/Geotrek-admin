@@ -14,7 +14,7 @@ from django.utils.translation import gettext as _
 from django.core.files.uploadedfile import UploadedFile
 
 from geotrek.common.parsers import (AttachmentParserMixin, Parser,
-                                    TourInSoftParser)
+                                    TourInSoftParser, LEIParser)
 from geotrek.tourism.models import (InformationDesk, TouristicContent, TouristicEvent,
                                     TouristicContentType1, TouristicContentType2)
 
